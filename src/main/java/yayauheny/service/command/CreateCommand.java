@@ -7,10 +7,13 @@ import yayauheny.entity.PlayerRole;
 import yayauheny.utils.DateTimeUtils;
 import yayauheny.utils.PasswordHasher;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.InputMismatchException;
-import java.util.Scanner;
 
 
 /**
@@ -33,13 +36,14 @@ public class CreateCommand implements Command {
     public void execute(Player player) {
         System.out.println("Регистрация нового игрока:");
         System.out.println("Введите имя:");
-        try (Scanner sc = new Scanner(System.in)) {
-            String inputName = sc.nextLine();
+        try {
+            BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+            String inputName = reader.readLine();
             System.out.println("Введите дату рождения (гггг.мм.дд)");
-            String inputDate = sc.nextLine();
+            String inputDate = reader.readLine();
             LocalDate birthDate = LocalDate.parse(inputDate, DateTimeUtils.dateFormatter);
             System.out.println("Выберите роль игрока:\n1 - пользователь\n2 - администратор");
-            byte inputRole = sc.nextByte();
+            int inputRole = Integer.parseInt(reader.readLine());
             PlayerRole role;
             switch (inputRole) {
                 case 1 -> role = PlayerRole.USER;
@@ -47,12 +51,14 @@ public class CreateCommand implements Command {
                 default -> throw new InputMismatchException();
             }
             System.out.println("Введите пароль:");
-            String inputPassword = sc.nextLine();
+            String inputPassword = reader.readLine();
 
             registerPlayer(inputName, role, PasswordHasher.hashPassword(inputPassword), birthDate);
-        } catch (InputMismatchException e) {
+            System.out.println("Аккаунт был успешно зарегистрирован.");
+        } catch (InputMismatchException | DateTimeParseException e) {
             System.err.println("Некорректный ввод, попробуйте снова");
-            execute(player);
+        } catch (NumberFormatException | IOException e) {
+            throw new RuntimeException(e);
         }
     }
 

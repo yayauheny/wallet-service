@@ -49,7 +49,6 @@ public class Validator {
         TransactionType transactionType = transaction.getType();
 
         validateAmount(transactionAmount);
-
         if (transactionType.equals(TransactionType.DEBIT) && participantBalance.compareTo(transactionAmount) < 0) {
             throw new TransactionException("Cannot perform transfer, incorrect amount");
         }

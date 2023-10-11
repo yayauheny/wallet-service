@@ -7,6 +7,9 @@ import yayauheny.service.impl.SummaryReceiptService;
 import yayauheny.service.impl.TransactionServiceImpl;
 import yayauheny.utils.DateTimeUtils;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -59,15 +62,16 @@ public class ReadTransactionsCommand implements Command {
 
     private Receipt readTransactionsByPeriod(Player player) {
         System.out.println("Введите дату начала истории транзакций (гггг.мм.дд):");
-        try (Scanner sc = new Scanner(System.in)) {
-            String inputDateFrom = sc.nextLine();
+        try {
+            BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+            String inputDateFrom = reader.readLine();
             LocalDateTime dateFrom = LocalDateTime.parse(inputDateFrom, DateTimeUtils.dateFormatter);
             System.out.println("Введите дату конца истории транзакций (гггг.мм.дд):");
-            String inputDateTo = sc.nextLine();
+            String inputDateTo = reader.readLine();
             LocalDateTime dateTo = LocalDateTime.parse(inputDateTo, DateTimeUtils.dateFormatter);
 
             return new Receipt(player.getAccount(), player, dateFrom, dateTo);
-        } catch (InputMismatchException e) {
+        } catch (InputMismatchException | NumberFormatException | IOException e) {
             System.err.println("Некорректный ввод, попробуйте снова");
             return readTransactionsByPeriod(player);
         }

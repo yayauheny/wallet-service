@@ -5,9 +5,9 @@ import yayauheny.entity.Currency;
 import yayauheny.entity.Player;
 import yayauheny.entity.PlayerRole;
 import yayauheny.service.command.Command;
+import yayauheny.service.command.CreateCommand;
 import yayauheny.service.impl.AccountServiceImpl;
 import yayauheny.service.impl.PlayerServiceImpl;
-import yayauheny.utils.DateTimeUtils;
 import yayauheny.utils.PasswordHasher;
 import yayauheny.utils.PermissionsManager;
 
@@ -16,7 +16,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.format.DateTimeParseException;
 import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Optional;
@@ -32,6 +31,8 @@ public class ConsoleRunner {
     private static final AccountServiceImpl accountService = AccountServiceImpl.getInstance();
     private static final Currency USD = new Currency(BigDecimal.ONE, "USD");
     private static BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+    private static final String INCORRECT_INPUT = "Некорректный ввод, попробуйте снова";
+    private static Player currentPlayer;
 
     /**
      * The main method to start the console-based user interface.
@@ -39,8 +40,7 @@ public class ConsoleRunner {
      * @param args Command line arguments (not used).
      */
     public static void main(String[] args) throws IOException {
-        Player player = authenticate();
-        authorize(player);
+        authenticate();
         reader.close();
     }
 
@@ -49,27 +49,34 @@ public class ConsoleRunner {
      *
      * @return The authenticated player.
      */
-    private static Player authenticate() {
+    private static void authenticate() {
         String authMessage = """
                 Войдите или зарегистрируйтесь в системе, чтобы продолжить работу:
                 1 - войти
                 2 - зарегистрироваться
                 3 - выйти
                 """;
-        String incorrectInput = "Некорректный ввод, попробуйте снова";
-
         try {
             System.out.println(authMessage);
-            int firstChoice = Integer.parseInt(reader.readLine());
-            return switch (firstChoice) {
-                case 1 -> login();
-                case 2 -> register();
-                case 3 -> null;
+            int choice = Integer.parseInt(reader.readLine());
+            switch (choice) {
+                case 1 -> {
+                    if (login()) {
+                        authorize(currentPlayer);
+                    }
+                }
+                case 2 -> {
+                    if (register()) {
+                        authorize(currentPlayer);
+                    }
+                }
+                case 3 -> System.out.println("Выход из приложения");
                 default -> throw new InputMismatchException();
-            };
-        } catch (InputMismatchException | IOException e) {
-            System.err.println(incorrectInput);
-            return authenticate();
+            }
+        } catch (InputMismatchException | NumberFormatException |
+                 IOException e) {
+            System.err.println(INCORRECT_INPUT);
+            authenticate();
         }
     }
 
@@ -79,26 +86,36 @@ public class ConsoleRunner {
      * @param player The authenticated player.
      */
     private static void authorize(Player player) {
-        System.out.println("Добро пожаловать в систему, " + player.getUsername() + "\nСписок доступных действий:");
-        List<Command> commands = PermissionsManager.getCommands(player.getRole());
+        if (currentPlayer == null) {
+            authenticate();
+        }
+
+        System.out.println("\nСписок доступных действий:");
+        List<Command> commands = PermissionsManager.getCommands(currentPlayer.getRole());
         for (int i = 0; i < commands.size(); i++) {
             System.out.println(i + 1 + " - " + commands.get(i).getName());
         }
-        System.out.println("выход - выйти\n\n");
+        int exitNumber = commands.size() + 1;
+        int exitFromAccountNumber = commands.size() + 2;
+        System.out.println(exitNumber + " - выйти\n" + exitFromAccountNumber + " - выйти из аккаунта");
         System.out.println("Введите команду:");
         try {
-            String input = reader.readLine();
+            int choice = Integer.parseInt(reader.readLine());
 
-            int choice = Integer.parseInt(input);
-            if (choice > 0 && choice <= commands.size()) {
+            if (choice == exitNumber) {
+                System.out.println("Завершение работы...");
+            } else if (choice == exitFromAccountNumber) {
+                currentPlayer = null;
+                authenticate();
+            } else if (choice > 0 && choice <= commands.size()) {
                 commands.get(choice - 1).execute(player);
+                authorize(player);
             } else {
-                System.out.println("Некорректный ввод");
+                throw new IllegalArgumentException();
             }
-
-        } catch (IOException e) {
-            System.err.println("Некорректный ввод, попробуйте снова");
-            authorize(player);
+        } catch (IOException | IllegalArgumentException e) {
+            System.err.println(INCORRECT_INPUT);
+            authorize(currentPlayer);
         }
     }
 
@@ -107,16 +124,15 @@ public class ConsoleRunner {
      *
      * @return The logged-in player.
      */
-    private static Player login() {
+    private static boolean login() {
         try {
             System.out.println("Введите логин:");
             String loginInput = reader.readLine();
             System.out.println("Введите пароль:");
             String password = reader.readLine();
-
             return processLoginCredentials(loginInput, password);
         } catch (InputMismatchException | IOException e) {
-            System.err.println("Некорректный ввод, попробуйте снова");
+            System.err.println(INCORRECT_INPUT);
             return login();
         }
     }
@@ -126,34 +142,33 @@ public class ConsoleRunner {
      *
      * @return The newly registered player.
      */
-    private static Player register() {
-        return registrateNewPlayer();
+    private static boolean register() {
+        return registerNewPlayer();
     }
 
     /**
      * Processes the login credentials provided by the user.
      *
-     * @param username The entered username.
-     * @param password The entered password.
+     * @param username      The entered username.
+     * @param inputPassword The entered password.
      * @return The authenticated player.
      */
-    private static Player processLoginCredentials(String username, String password) {
+    private static boolean processLoginCredentials(String username, String inputPassword) {
         Optional<Player> maybePlayer = playerService.findByUsername(username);
-
+        boolean isVerified = false;
         if (maybePlayer.isPresent()) {
             Player player = maybePlayer.get();
-            byte[] hashedPassword = player.getHashedPassword();
-            boolean isMatch = PasswordHasher.checkPassword(password, hashedPassword);
-            if (isMatch) {
-                return player;
+            byte[] originalPassword = player.getHashedPassword();
+            if (PasswordHasher.checkPassword(inputPassword, originalPassword)) {
+                currentPlayer = player;
+                isVerified = true;
             } else {
-                System.out.println("Неверные данные, попробуйте снова");
-                return authenticate();
+                System.err.println(INCORRECT_INPUT);
             }
         } else {
-            System.out.println("Такого пользователя не существует, зарегистрируйтесь или проверьте логин");
-            return authenticate();
+            System.err.println("Такого пользователя не существует, зарегистрируйтесь или проверьте логин");
         }
+        return isVerified;
     }
 
     /**
@@ -161,36 +176,11 @@ public class ConsoleRunner {
      *
      * @return The newly registered player.
      */
-    private static Player registrateNewPlayer() {
-        System.out.println("Регистрация нового игрока:");
-        System.out.println("Введите имя:");
-
-        try {
-            String inputName = reader.readLine();
-            System.out.println("Введите дату рождения (гггг.мм.дд)");
-            String inputDate = reader.readLine();
-            LocalDate birthDate = LocalDate.parse(inputDate, DateTimeUtils.dateFormatter);
-
-            System.out.println("Выберите роль игрока:\n1 - пользователь\n2 - администратор");
-            int inputRole = Integer.parseInt(reader.readLine());
-
-            PlayerRole role;
-            switch (inputRole) {
-                case 1 -> role = PlayerRole.USER;
-                case 2 -> role = PlayerRole.ADMIN;
-                default -> throw new InputMismatchException();
-            }
-
-            System.out.println("Введите пароль:");
-            String inputPassword = reader.readLine();
-
-            return createNewPlayer(inputName, role, PasswordHasher.hashPassword(inputPassword), birthDate);
-        } catch (InputMismatchException | DateTimeParseException | NumberFormatException | IOException e) {
-            System.err.println("Некорректный ввод, попробуйте снова");
-            return registrateNewPlayer();
-        }
+    private static boolean registerNewPlayer() {
+        Command command = new CreateCommand();
+        command.execute(null);
+        return true;
     }
-
 
     /**
      * Creates a new player and associated account based on user details.

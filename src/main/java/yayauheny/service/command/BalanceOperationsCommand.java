@@ -1,11 +1,15 @@
 package yayauheny.service.command;
 
 import yayauheny.entity.Account;
+import yayauheny.entity.Currency;
 import yayauheny.entity.Player;
 import yayauheny.entity.Transaction;
 import yayauheny.entity.TransactionType;
 import yayauheny.service.impl.TransactionServiceImpl;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.util.InputMismatchException;
 import java.util.Scanner;
@@ -16,6 +20,8 @@ import java.util.Scanner;
  * allowing users to perform balance operations such as crediting and debiting funds.
  */
 public class BalanceOperationsCommand implements Command {
+
+    private static final Currency DEFAULT_CURRENCY = new Currency(BigDecimal.ONE, "USD");
 
     /**
      * The singleton instance of the {@code TransactionServiceImpl}.
@@ -77,26 +83,27 @@ public class BalanceOperationsCommand implements Command {
      * @param transactionType The type of the transaction (debit or credit).
      */
     private void buildTransaction(Account account, TransactionType transactionType) {
-        String currencyCode = account.getCurrency().getCode();
         switch (transactionType) {
-            case DEBIT -> System.out.println(String.format("Введите сумму (%s) списания:", currencyCode));
-            case CREDIT -> System.out.println(String.format("Введите сумму (%s) пополнения:", currencyCode));
+            case DEBIT -> System.out.println(String.format("Введите сумму (%s) списания:", DEFAULT_CURRENCY.getCode()));
+            case CREDIT -> System.out.println(String.format("Введите сумму (%s) пополнения:", DEFAULT_CURRENCY.getCode()));
         }
 
-        try (Scanner sc = new Scanner(System.in)) {
-            BigDecimal inputAmount = sc.nextBigDecimal();
+        try {
+            BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+            BigDecimal inputAmount = BigDecimal.valueOf(Long.parseLong(reader.readLine()));
             System.out.println("Введите уникальный номер транзакции (id)");
-            long inputId = sc.nextLong();
+            long inputId = Long.parseLong(reader.readLine());
 
             Transaction transaction = Transaction.builder()
                     .id(inputId)
                     .amount(inputAmount)
                     .type(transactionType)
                     .participantAccount(account)
+                    .currency(DEFAULT_CURRENCY)
                     .build();
             transactionService.processTransactionAndUpdateAccount(transaction, account);
             System.out.println("Транзакция прошла успешно, текущий баланс: " + account.getCurrentBalance());
-        } catch (InputMismatchException e) {
+        } catch (InputMismatchException | IOException e) {
             System.err.println("Некорректный ввод, попробуйте снова");
             buildTransaction(account, transactionType);
         }

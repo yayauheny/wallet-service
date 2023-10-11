@@ -3,9 +3,7 @@ package yayauheny.entity;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -27,9 +25,8 @@ public class Account {
     private LocalDate createdAt;
 
     @Builder
-    public Account(BigDecimal currentBalance, List<Transaction> transactions, Currency currency, Long playerId) {
+    public Account(List<Transaction> transactions, Currency currency, Long playerId) {
         this.id = idCounter++;
-        this.currentBalance = currentBalance;
         this.transactions = transactions;
         this.currency = currency;
         this.playerId = playerId;

@@ -100,7 +100,12 @@ public class TransactionServiceImpl implements TransactionService<Long> {
         transaction.setParticipantAccount(account);
         Validator.validateTransaction(transaction);
 
-        BigDecimal updatedBalance = account.getCurrentBalance().subtract(transaction.getAmount());
+        BigDecimal updatedBalance;
+        switch (transaction.getType()) {
+            case CREDIT -> updatedBalance = account.getCurrentBalance().add(transaction.getAmount());
+            case DEBIT -> updatedBalance = account.getCurrentBalance().subtract(transaction.getAmount());
+            default -> updatedBalance = account.getCurrentBalance();
+        }
         transactionRepository.save(transaction);
         accountService.updateBalance(account, updatedBalance);
     }
