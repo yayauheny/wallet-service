@@ -2,6 +2,7 @@ package yayauheny.service.command;
 
 import yayauheny.entity.Player;
 import yayauheny.entity.PlayerRole;
+import yayauheny.service.impl.Auditor;
 import yayauheny.utils.DateTimeUtils;
 
 import java.io.BufferedReader;
@@ -100,6 +101,7 @@ public class EditCommand implements Command {
                 }
             }
             System.out.println("Данные изменены");
+            Auditor.log("player: %s info have been changed".formatted(player.getUsername()));
         } catch (InputMismatchException | DateTimeParseException | IOException e) {
             System.err.println("Некорректный ввод, попробуйте снова");
             updatePlayer(player);

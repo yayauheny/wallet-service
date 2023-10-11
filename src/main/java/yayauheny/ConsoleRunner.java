@@ -7,6 +7,7 @@ import yayauheny.entity.PlayerRole;
 import yayauheny.service.command.Command;
 import yayauheny.service.command.CreateCommand;
 import yayauheny.service.impl.AccountServiceImpl;
+import yayauheny.service.impl.Auditor;
 import yayauheny.service.impl.PlayerServiceImpl;
 import yayauheny.utils.PasswordHasher;
 import yayauheny.utils.PermissionsManager;
@@ -89,6 +90,7 @@ public class ConsoleRunner {
         if (currentPlayer == null) {
             authenticate();
         }
+        Auditor.log("player: %s have been authorized".formatted(currentPlayer.getUsername()));
 
         System.out.println("\nСписок доступных действий:");
         List<Command> commands = PermissionsManager.getCommands(currentPlayer.getRole());
@@ -162,6 +164,7 @@ public class ConsoleRunner {
             if (PasswordHasher.checkPassword(inputPassword, originalPassword)) {
                 currentPlayer = player;
                 isVerified = true;
+                Auditor.log("player: %s is logged in".formatted(player.getUsername()));
             } else {
                 System.err.println(INCORRECT_INPUT);
             }

@@ -3,6 +3,7 @@ package yayauheny.service.impl;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.ArrayDeque;
 import java.util.Queue;
 
@@ -24,7 +25,8 @@ public class Auditor {
      * @param message The message to log.
      */
     public static void log(String message) {
-        LOG.add(message);
+        String formattedMessage = String.format("[%s] %s", LocalDateTime.now(), message);
+        LOG.add(formattedMessage);
     }
 
     /**

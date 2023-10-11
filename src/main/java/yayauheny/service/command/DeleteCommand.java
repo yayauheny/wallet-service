@@ -1,6 +1,7 @@
 package yayauheny.service.command;
 
 import yayauheny.entity.Player;
+import yayauheny.service.impl.Auditor;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -52,9 +53,10 @@ public class DeleteCommand implements Command {
             if (maybePlayer.isPresent()) {
                 Player player = maybePlayer.get();
                 accountService.delete(player.getAccount());
-                playerService.delete(maybePlayer.get());
+                playerService.delete(player);
 
                 System.out.println("Пользователь успешно удален");
+                Auditor.log("player: %s has been deleted" + player.getUsername());
             } else {
                 throw new InputMismatchException();
             }

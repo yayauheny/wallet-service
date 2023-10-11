@@ -2,6 +2,7 @@ package yayauheny.service.command;
 
 import yayauheny.entity.Player;
 import yayauheny.entity.Receipt;
+import yayauheny.service.impl.Auditor;
 import yayauheny.service.impl.ReceiptService;
 import yayauheny.service.impl.SummaryReceiptService;
 import yayauheny.service.impl.TransactionServiceImpl;
@@ -32,7 +33,6 @@ public class ReadTransactionsCommand implements Command {
      */
     @Override
     public void execute(Player player) {
-        Long accountId = player.getAccount().getPlayerId();
         System.out.println("Выберите период выписки:\n1 - ввести вручную\n2 - все транзакции");
         try (Scanner sc = new Scanner(System.in)) {
             byte choice = sc.nextByte();
@@ -44,6 +44,7 @@ public class ReadTransactionsCommand implements Command {
             }
             ReceiptService receiptService = SummaryReceiptService.getInstance();
             System.out.println(receiptService.buildReceipt(receipt));
+            Auditor.log("player: %s created receipt".formatted(player.getUsername()));
         } catch (InputMismatchException e) {
             System.err.println("Некорректный ввод, попробуйте снова");
             execute(player);

@@ -21,7 +21,7 @@ public class CurrencyRepositoryImpl implements CurrencyRepository<Long, Currency
 
     private static final CurrencyRepositoryImpl INSTANCE = new CurrencyRepositoryImpl();
     private static final int COLLECTION_DEFAULT_CAPACITY = 10;
-    private final Map<Long, Currency> currenciesMap = new HashMap<>(COLLECTION_DEFAULT_CAPACITY);
+    public static final Map<Long, Currency> currenciesMap = new HashMap<>(COLLECTION_DEFAULT_CAPACITY);
 
     /**
      * Gets the singleton instance of the {@code CurrencyRepositoryImpl} class.

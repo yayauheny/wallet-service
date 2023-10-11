@@ -6,6 +6,7 @@ import yayauheny.entity.Player;
 import yayauheny.entity.Transaction;
 import yayauheny.entity.TransactionType;
 import yayauheny.exception.TransactionException;
+import yayauheny.service.impl.Auditor;
 import yayauheny.service.impl.TransactionServiceImpl;
 
 import java.io.BufferedReader;
@@ -106,6 +107,8 @@ public class BalanceOperationsCommand implements Command {
                     .build();
             transactionService.processTransactionAndUpdateAccount(transaction, account);
             System.out.println("Транзакция прошла успешно, текущий баланс: " + account.getCurrentBalance());
+            Auditor.log(String.format("player: %s commited transaction: %s",
+                    player.getUsername(), transactionType + ": " + transaction.getAmount() + transaction.getCurrency().getCode()));
         } catch (InputMismatchException | IOException e) {
             System.err.println("Некорректный ввод, попробуйте снова");
             buildTransaction(player, transactionType);

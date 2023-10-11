@@ -4,6 +4,7 @@ import yayauheny.entity.Account;
 import yayauheny.entity.Currency;
 import yayauheny.entity.Player;
 import yayauheny.entity.PlayerRole;
+import yayauheny.service.impl.Auditor;
 import yayauheny.utils.DateTimeUtils;
 import yayauheny.utils.PasswordHasher;
 
@@ -53,8 +54,9 @@ public class CreateCommand implements Command {
             System.out.println("Введите пароль:");
             String inputPassword = reader.readLine();
 
-            registerPlayer(inputName, role, PasswordHasher.hashPassword(inputPassword), birthDate);
+            Player createdPlayer = registerPlayer(inputName, role, PasswordHasher.hashPassword(inputPassword), birthDate);
             System.out.println("Аккаунт был успешно зарегистрирован.");
+            Auditor.log("player: %s has been created".formatted(createdPlayer.getUsername()));
         } catch (InputMismatchException | DateTimeParseException e) {
             System.err.println("Некорректный ввод, попробуйте снова");
             execute(player);

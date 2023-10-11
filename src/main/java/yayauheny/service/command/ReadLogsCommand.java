@@ -19,6 +19,7 @@ public class ReadLogsCommand implements Command {
      */
     @Override
     public void execute(Player player) {
+        Auditor.log("player: %s opened log".formatted(player.getUsername()));
         System.out.println("Список действий текущей сессии:");
         Queue<String> log = Auditor.getLog();
         log.forEach(System.out::println);
