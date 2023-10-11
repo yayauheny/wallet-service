@@ -10,7 +10,6 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Data
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class Transaction {
@@ -19,4 +18,16 @@ public class Transaction {
     private LocalDateTime createdAt;
     private TransactionType type;
     private BigDecimal amount;
+    private Account participantAccount;
+    private Currency currency;
+
+    @Builder
+    public Transaction(Long id, TransactionType type, BigDecimal amount, Account participantAccount, Currency currency) {
+        this.id = id;
+        this.createdAt = LocalDateTime.now();
+        this.type = type;
+        this.amount = amount;
+        this.participantAccount = participantAccount;
+        this.currency = currency;
+    }
 }

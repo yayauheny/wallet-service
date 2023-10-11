@@ -1,0 +1,9 @@
+
+L	java:S106"+Replace this use of System.out by a logger.(Õ”ìåùÿÿÿÿ8æ†¹ó±1
+L	java:S106""+Replace this use of System.out by a logger.(Š–ê’ûÿÿÿÿ8é†¹ó±1
+L	java:S106$"+Replace this use of System.err by a logger.(ŞÕ¯îúÿÿÿÿ8é†¹ó±1
+L	java:S106/"+Replace this use of System.out by a logger.(—öİÎÿÿÿÿÿ8ê†¹ó±1
+L	java:S1063"+Replace this use of System.out by a logger.(ÀÂõˆùÿÿÿÿ8ë†¹ó±1
+L	java:S1069"+Replace this use of System.err by a logger.(ŞÕ¯îúÿÿÿÿ8ë†¹ó±1
+S
+java:S1068"6Remove this unused "transactionService" private field.(Ø³æ8ì†¹ó±1
