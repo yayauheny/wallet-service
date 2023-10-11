@@ -57,6 +57,7 @@ public class CreateCommand implements Command {
             System.out.println("Аккаунт был успешно зарегистрирован.");
         } catch (InputMismatchException | DateTimeParseException e) {
             System.err.println("Некорректный ввод, попробуйте снова");
+            execute(player);
         } catch (NumberFormatException | IOException e) {
             throw new RuntimeException(e);
         }

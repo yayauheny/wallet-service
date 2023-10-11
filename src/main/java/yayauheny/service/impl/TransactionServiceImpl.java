@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import yayauheny.entity.Account;
 import yayauheny.entity.Transaction;
+import yayauheny.exception.TransactionException;
 import yayauheny.repository.impl.TransactionRepositoryImpl;
 import yayauheny.service.TransactionService;
 import yayauheny.utils.Validator;
@@ -99,6 +100,9 @@ public class TransactionServiceImpl implements TransactionService<Long> {
     public void processTransactionAndUpdateAccount(Transaction transaction, Account account) {
         transaction.setParticipantAccount(account);
         Validator.validateTransaction(transaction);
+        if (findById(transaction.getId()).isPresent()) {
+            throw new TransactionException("Transaction id is not uniqie, please, provide another id");
+        }
 
         BigDecimal updatedBalance;
         switch (transaction.getType()) {

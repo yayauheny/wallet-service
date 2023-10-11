@@ -167,6 +167,7 @@ public class ConsoleRunner {
             }
         } else {
             System.err.println("Такого пользователя не существует, зарегистрируйтесь или проверьте логин");
+            authenticate();
         }
         return isVerified;
     }
