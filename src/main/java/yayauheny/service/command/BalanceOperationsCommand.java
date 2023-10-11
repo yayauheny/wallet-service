@@ -80,7 +80,7 @@ public class BalanceOperationsCommand implements Command {
     /**
      * Builds a transaction based on user input.
      *
-     * @param player         The account associated with the transaction.
+     * @param player          The account associated with the transaction.
      * @param transactionType The type of the transaction (debit or credit).
      */
     private void buildTransaction(Player player, TransactionType transactionType) {
@@ -109,7 +109,7 @@ public class BalanceOperationsCommand implements Command {
         } catch (InputMismatchException | IOException e) {
             System.err.println("Некорректный ввод, попробуйте снова");
             buildTransaction(player, transactionType);
-        } catch (TransactionException e){f
+        } catch (TransactionException e) {
             System.err.println(e.getMessage());
             execute(player);
         }
