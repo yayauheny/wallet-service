@@ -16,10 +16,10 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Optional;
-import java.util.Scanner;
 
 
 /**
@@ -31,15 +31,17 @@ public class ConsoleRunner {
     private static final PlayerServiceImpl playerService = PlayerServiceImpl.getInstance();
     private static final AccountServiceImpl accountService = AccountServiceImpl.getInstance();
     private static final Currency USD = new Currency(BigDecimal.ONE, "USD");
+    private static BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 
     /**
      * The main method to start the console-based user interface.
      *
      * @param args Command line arguments (not used).
      */
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         Player player = authenticate();
         authorize(player);
+        reader.close();
     }
 
     /**
@@ -52,15 +54,17 @@ public class ConsoleRunner {
                 Войдите или зарегистрируйтесь в системе, чтобы продолжить работу:
                 1 - войти
                 2 - зарегистрироваться
+                3 - выйти
                 """;
         String incorrectInput = "Некорректный ввод, попробуйте снова";
 
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(System.in))) {
+        try {
             System.out.println(authMessage);
-            byte firstChoice = Byte.parseByte(reader.readLine());
+            int firstChoice = Integer.parseInt(reader.readLine());
             return switch (firstChoice) {
                 case 1 -> login();
                 case 2 -> register();
+                case 3 -> null;
                 default -> throw new InputMismatchException();
             };
         } catch (InputMismatchException | IOException e) {
@@ -77,25 +81,24 @@ public class ConsoleRunner {
     private static void authorize(Player player) {
         System.out.println("Добро пожаловать в систему, " + player.getUsername() + "\nСписок доступных действий:");
         List<Command> commands = PermissionsManager.getCommands(player.getRole());
-        while (true) {
-            for (int i = 0; i < commands.size(); i++) {
-                System.out.println(i + 1 + " - " + commands.get(i).getName());
+        for (int i = 0; i < commands.size(); i++) {
+            System.out.println(i + 1 + " - " + commands.get(i).getName());
+        }
+        System.out.println("выход - выйти\n\n");
+        System.out.println("Введите команду:");
+        try {
+            String input = reader.readLine();
+
+            int choice = Integer.parseInt(input);
+            if (choice > 0 && choice <= commands.size()) {
+                commands.get(choice - 1).execute(player);
+            } else {
+                System.out.println("Некорректный ввод");
             }
-            System.out.println("выход - выйти");
-            System.out.println("Введите команду:");
-            try (Scanner sc = new Scanner(System.in)) {
-                String input = sc.nextLine();
-                if (input.equalsIgnoreCase("выход")) {
-                    break;
-                } else {
-                    int choice = Integer.parseInt(input);
-                    if (choice > 0 && choice <= commands.size()) {
-                        commands.get(choice - 1).execute(player);
-                    } else {
-                        System.out.println("Некорректный ввод");
-                    }
-                }
-            }
+
+        } catch (IOException e) {
+            System.err.println("Некорректный ввод, попробуйте снова");
+            authorize(player);
         }
     }
 
@@ -105,14 +108,14 @@ public class ConsoleRunner {
      * @return The logged-in player.
      */
     private static Player login() {
-        try (Scanner sc = new Scanner(System.in)) {
+        try {
             System.out.println("Введите логин:");
-            String loginInput = sc.nextLine();
+            String loginInput = reader.readLine();
             System.out.println("Введите пароль:");
-            String password = sc.nextLine();
+            String password = reader.readLine();
 
             return processLoginCredentials(loginInput, password);
-        } catch (InputMismatchException e) {
+        } catch (InputMismatchException | IOException e) {
             System.err.println("Некорректный ввод, попробуйте снова");
             return login();
         }
@@ -161,28 +164,33 @@ public class ConsoleRunner {
     private static Player registrateNewPlayer() {
         System.out.println("Регистрация нового игрока:");
         System.out.println("Введите имя:");
-        try (Scanner sc = new Scanner(System.in)) {
-            String inputName = sc.nextLine();
+
+        try {
+            String inputName = reader.readLine();
             System.out.println("Введите дату рождения (гггг.мм.дд)");
-            String inputDate = sc.nextLine();
+            String inputDate = reader.readLine();
             LocalDate birthDate = LocalDate.parse(inputDate, DateTimeUtils.dateFormatter);
+
             System.out.println("Выберите роль игрока:\n1 - пользователь\n2 - администратор");
-            int inputRole = sc.nextInt();
+            int inputRole = Integer.parseInt(reader.readLine());
+
             PlayerRole role;
             switch (inputRole) {
                 case 1 -> role = PlayerRole.USER;
                 case 2 -> role = PlayerRole.ADMIN;
                 default -> throw new InputMismatchException();
             }
+
             System.out.println("Введите пароль:");
-            String inputPassword = sc.nextLine();
+            String inputPassword = reader.readLine();
 
             return createNewPlayer(inputName, role, PasswordHasher.hashPassword(inputPassword), birthDate);
-        } catch (InputMismatchException e) {
+        } catch (InputMismatchException | DateTimeParseException | NumberFormatException | IOException e) {
             System.err.println("Некорректный ввод, попробуйте снова");
             return registrateNewPlayer();
         }
     }
+
 
     /**
      * Creates a new player and associated account based on user details.
