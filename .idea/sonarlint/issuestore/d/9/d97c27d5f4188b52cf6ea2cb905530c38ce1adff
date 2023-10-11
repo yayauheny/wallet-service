@@ -1,13 +1,0 @@
-
-m
-java:S1301B"KReplace this "switch" statement by "if" statements to increase readability.(–©‡âûÿÿÿÿ8÷·Îï±1
-G	java:S106"+Replace this use of System.out by a logger.(õõÏÂ8ÿ·Îï±1
-L	java:S106("+Replace this use of System.err by a logger.(ŞÕ¯îúÿÿÿÿ8ƒ¸Îï±1
-L	java:S106."+Replace this use of System.out by a logger.(Ì¡æ¾ıÿÿÿÿ8„¸Îï±1
->	java:S1311""Add a default case to this switch.(¨ÕÉ8…¸Îï±1
-G	java:S1063"+Replace this use of System.out by a logger.(î˜ğÈ8…¸Îï±1
-L	java:S1069"+Replace this use of System.out by a logger.(´§ô½ıÿÿÿÿ8†¸Îï±1
-G	java:S106@"+Replace this use of System.out by a logger.(ÇËÄì8åÉÏï±1
-C	java:S131B""Add a default case to this switch.(–©‡âûÿÿÿÿ8‡¸Îï±1
-G	java:S106J"+Replace this use of System.out by a logger.(î˜üí8Ñ¦Ñï±1
-L	java:S106L"+Replace this use of System.err by a logger.(ŞÕ¯îúÿÿÿÿ8ˆ¸Îï±1
