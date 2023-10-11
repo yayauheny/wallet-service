@@ -114,7 +114,6 @@ public class AccountRepositoryImplTest {
 
     private Account createTestAccount() {
         return Account.builder()
-                .currentBalance(BigDecimal.valueOf(1000))
                 .currency(new Currency(BigDecimal.ONE, "USD"))
                 .playerId(100L)
                 .build();
