@@ -8,6 +8,6 @@ Wallet-Service - консольное приложение, предоставл
 Для сборки проекта используйте следующие команды Gradle:
 
 ```./gradlew build```
-```java -cp build/libs/wallet-service-1.0-SNAPSHOT.jar yayauheny.ConsoleRunner```
+```java -cp build/libs/wallet-service-1.0-SNAPSHOT.jar io.ylab.walletservice.in.ConsoleRunner```
 ## Работа с проектом
 Для начала работы нужно выполнять инструкции, прописанные в консоли.
