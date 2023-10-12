@@ -1,13 +1,12 @@
 package io.ylab.walletservice.core.service.command;
 
+import io.ylab.walletservice.api.Auditor;
+import io.ylab.walletservice.core.domain.Account;
+import io.ylab.walletservice.core.domain.Player;
 import io.ylab.walletservice.core.domain.Transaction;
 import io.ylab.walletservice.core.domain.TransactionType;
-import io.ylab.walletservice.core.domain.Account;
-import io.ylab.walletservice.core.domain.Currency;
-import io.ylab.walletservice.core.domain.Player;
-import io.ylab.walletservice.exception.TransactionException;
-import io.ylab.walletservice.api.Auditor;
 import io.ylab.walletservice.core.service.impl.TransactionServiceImpl;
+import io.ylab.walletservice.exception.TransactionException;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -22,11 +21,6 @@ import java.util.InputMismatchException;
  */
 public class BalanceOperationsCommand implements Command {
 
-    private static final Currency DEFAULT_CURRENCY = new Currency(BigDecimal.ONE, "USD");
-
-    /**
-     * The singleton instance of the {@code TransactionServiceImpl}.
-     */
     private static final TransactionServiceImpl transactionService = new TransactionServiceImpl();
 
     /**

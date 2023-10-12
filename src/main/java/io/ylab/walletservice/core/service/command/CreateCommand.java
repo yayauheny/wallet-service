@@ -24,11 +24,6 @@ import java.util.InputMismatchException;
 public class CreateCommand implements Command {
 
     /**
-     * The predefined currency (USD) for the player account.
-     */
-    private static final Currency USD = new Currency(BigDecimal.ONE, "USD");
-
-    /**
      * Executes the create command to register a new player.
      *
      * @param player The player on which the command is executed.
@@ -93,7 +88,7 @@ public class CreateCommand implements Command {
                 .build();
         Account playerAccount = Account.builder()
                 .playerId(player.getId())
-                .currency(USD)
+                .currency(DEFAULT_CURRENCY)
                 .build();
         player.setAccount(playerAccount);
 

@@ -19,7 +19,11 @@ import java.util.Optional;
 @AllArgsConstructor
 public class AccountServiceImpl implements AccountService<Long> {
 
-    private static final Currency DEFAULT_CURRENCY = new Currency(BigDecimal.ONE, "USD");
+    private static final Currency DEFAULT_CURRENCY = Currency.builder()
+            .id(1L)
+            .rate(BigDecimal.ONE)
+            .code("USD")
+            .build();
     private final AccountRepositoryImpl accountRepository;
 
     public AccountServiceImpl() {
@@ -84,6 +88,7 @@ public class AccountServiceImpl implements AccountService<Long> {
      */
     @Override
     public void updateBalance(Account account, BigDecimal updatedBalance) {
+        Validator.validateAmount(updatedBalance);
         account.setCurrentBalance(updatedBalance);
         update(account);
     }

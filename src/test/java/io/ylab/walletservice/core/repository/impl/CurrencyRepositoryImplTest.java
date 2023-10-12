@@ -1,8 +1,7 @@
-package io.ylab.walletservice.repository.impl;
+package io.ylab.walletservice.core.repository.impl;
 
-import io.ylab.walletservice.core.repository.impl.CurrencyRepositoryImpl;
-import org.junit.jupiter.api.DisplayName;
 import io.ylab.walletservice.core.domain.Currency;
+import org.junit.jupiter.api.DisplayName;
 
 import java.math.BigDecimal;
 

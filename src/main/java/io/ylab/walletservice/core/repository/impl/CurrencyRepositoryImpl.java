@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
 
 
 /**
@@ -23,6 +24,7 @@ public class CurrencyRepositoryImpl implements CurrencyRepository<Long, Currency
     private static final int COLLECTION_DEFAULT_CAPACITY = 10;
     public static final Map<Long, Currency> currenciesMap = new HashMap<>(COLLECTION_DEFAULT_CAPACITY);
     private static final CurrencyRepositoryImpl INSTANCE = new CurrencyRepositoryImpl();
+    private static final AtomicInteger idCounter = new AtomicInteger(0);
 
     public static CurrencyRepositoryImpl getInstance() {
         return INSTANCE;
@@ -59,6 +61,10 @@ public class CurrencyRepositoryImpl implements CurrencyRepository<Long, Currency
      */
     @Override
     public Currency save(Currency currency) {
+        if (currency.getId() == null) {
+            idCounter.incrementAndGet();
+            currency.setId(idCounter.longValue());
+        }
         return currenciesMap.putIfAbsent(currency.getId(), currency);
     }
 

@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
 
 
 /**
@@ -24,10 +25,12 @@ public class TransactionRepositoryImpl implements TransactionRepository<Long> {
     private static final int COLLECTION_DEFAULT_CAPACITY = 10;
     private final Map<Long, Transaction> transactionsMap = new HashMap<>(COLLECTION_DEFAULT_CAPACITY);
     private static final TransactionRepositoryImpl INSTANCE = new TransactionRepositoryImpl();
+    private static final AtomicInteger idCounter = new AtomicInteger(0);
 
     public static TransactionRepositoryImpl getInstance() {
         return INSTANCE;
     }
+
     /**
      * {@inheritDoc}
      */
@@ -70,6 +73,10 @@ public class TransactionRepositoryImpl implements TransactionRepository<Long> {
      */
     @Override
     public Transaction save(Transaction transaction) {
+        if (transaction.getId() == null) {
+            idCounter.incrementAndGet();
+            transaction.setId(idCounter.longValue());
+        }
         return transactionsMap.putIfAbsent(transaction.getId(), transaction);
     }
 

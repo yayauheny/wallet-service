@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
 
 
 /**
@@ -23,6 +24,7 @@ public class AccountRepositoryImpl implements AccountRepository<Long, Account> {
     private static final int COLLECTION_DEFAULT_CAPACITY = 10;
     public static final Map<Long, Account> accountsMap = new HashMap<>(COLLECTION_DEFAULT_CAPACITY);
     private static final AccountRepositoryImpl INSTANCE = new AccountRepositoryImpl();
+    private static final AtomicInteger idCounter = new AtomicInteger(0);
 
     public static AccountRepositoryImpl getInstance() {
         return INSTANCE;
@@ -59,6 +61,10 @@ public class AccountRepositoryImpl implements AccountRepository<Long, Account> {
      */
     @Override
     public Account save(Account account) {
+        if (account.getId() == null) {
+            idCounter.incrementAndGet();
+            account.setId(idCounter.longValue());
+        }
         accountsMap.put(account.getId(), account);
         return findById(account.getId()).orElse(null);
     }

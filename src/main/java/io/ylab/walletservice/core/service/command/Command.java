@@ -1,10 +1,12 @@
 
 package io.ylab.walletservice.core.service.command;
 
+import io.ylab.walletservice.core.domain.Currency;
 import io.ylab.walletservice.core.domain.Player;
 import io.ylab.walletservice.core.service.impl.AccountServiceImpl;
 import io.ylab.walletservice.core.service.impl.PlayerServiceImpl;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -14,6 +16,11 @@ import java.util.List;
  */
 public interface Command {
 
+    Currency DEFAULT_CURRENCY = Currency.builder()
+            .id(1L)
+            .rate(BigDecimal.ONE)
+            .code("USD")
+            .build();
     PlayerServiceImpl playerService = new PlayerServiceImpl();
     AccountServiceImpl accountService = new AccountServiceImpl();
 

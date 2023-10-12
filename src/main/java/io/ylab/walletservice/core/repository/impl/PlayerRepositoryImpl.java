@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
 
 
 /**
@@ -23,6 +24,7 @@ public class PlayerRepositoryImpl implements PlayerRepository<Long, Player> {
     private static final int COLLECTION_DEFAULT_CAPACITY = 10;
     private final Map<Long, Player> playersMap = new HashMap<>(COLLECTION_DEFAULT_CAPACITY);
     private static final PlayerRepositoryImpl INSTANCE = new PlayerRepositoryImpl();
+    private static final AtomicInteger idCounter = new AtomicInteger(0);
 
     public static PlayerRepositoryImpl getInstance() {
         return INSTANCE;
@@ -59,6 +61,10 @@ public class PlayerRepositoryImpl implements PlayerRepository<Long, Player> {
      */
     @Override
     public void save(Player player) {
+        if (player.getId() == null) {
+            idCounter.incrementAndGet();
+            player.setId(idCounter.longValue());
+        }
         playersMap.putIfAbsent(player.getId(), player);
     }
 
