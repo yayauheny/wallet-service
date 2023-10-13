@@ -56,7 +56,6 @@ public interface Command {
     default List<Player> printAllPlayers() {
         System.out.println("Список пользователей:");
         List<Player> players = playerService.findAll();
-
         for (Player player : players) {
             System.out.println(String.format(PLAYER_FORMAT,
                     player.getId(),

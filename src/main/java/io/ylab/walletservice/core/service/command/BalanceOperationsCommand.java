@@ -85,13 +85,11 @@ public class BalanceOperationsCommand implements Command {
             case CREDIT ->
                     System.out.println(String.format("Введите сумму (%s) пополнения:", DEFAULT_CURRENCY.getCode()));
         }
-
         try {
             BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
             BigDecimal inputAmount = BigDecimal.valueOf(Long.parseLong(reader.readLine()));
             System.out.println("Введите уникальный номер транзакции (id)");
             long inputId = Long.parseLong(reader.readLine());
-
             Transaction transaction = Transaction.builder()
                     .id(inputId)
                     .amount(inputAmount)

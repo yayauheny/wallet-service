@@ -40,6 +40,7 @@ public class AccountServiceImpl implements AccountService<Long> {
     @Override
     public Optional<Account> findById(Long id) {
         Validator.validateId(id);
+
         return accountRepository.findById(id);
     }
 

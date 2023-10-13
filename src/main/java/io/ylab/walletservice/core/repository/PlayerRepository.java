@@ -41,8 +41,9 @@ public interface PlayerRepository<K, E> {
      * Saves a new player entity.
      *
      * @param player The player entity to be saved.
+     * @return player - {@link Player} entity
      */
-    void save(E player);
+    Player save(E player);
 
     /**
      * Updates an existing player entity.

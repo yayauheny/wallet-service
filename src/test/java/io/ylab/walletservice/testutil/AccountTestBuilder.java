@@ -1,4 +1,4 @@
-package io.ylab.walletservice.util;
+package io.ylab.walletservice.testutil;
 
 import io.ylab.walletservice.core.domain.Account;
 import io.ylab.walletservice.core.domain.Currency;
@@ -8,7 +8,7 @@ import lombok.With;
 
 import java.math.BigDecimal;
 
-import static io.ylab.walletservice.util.TestObjectsUtil.TEST_CURRENCY;
+import static io.ylab.walletservice.testutil.TestObjectsUtil.TEST_CURRENCY;
 
 
 @AllArgsConstructor

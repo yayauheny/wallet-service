@@ -38,7 +38,7 @@ public interface TransactionRepository<K> {
      * @param accountId The identifier of the account for which transactions are retrieved.
      * @return A list of transaction entities.
      */
-    List<Transaction> findByAccountId(Long accountId);
+    List<Transaction> findAllByAccountId(Long accountId);
 
     /**
      * Retrieves a list of all transactions in the repository.

@@ -5,6 +5,7 @@ import io.ylab.walletservice.core.repository.PlayerRepository;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -53,19 +54,22 @@ public class PlayerRepositoryImpl implements PlayerRepository<Long, Player> {
      */
     @Override
     public List<Player> findAll() {
-        return List.copyOf(playersMap.values());
+        return new ArrayList<>(playersMap.values());
     }
 
     /**
      * {@inheritDoc}
+     *
+     *
      */
     @Override
-    public void save(Player player) {
+    public Player save(Player player) {
         if (player.getId() == null) {
             idCounter.incrementAndGet();
             player.setId(idCounter.longValue());
         }
         playersMap.putIfAbsent(player.getId(), player);
+        return findById(player.getId()).orElse(null);
     }
 
     /**

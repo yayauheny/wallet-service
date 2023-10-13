@@ -2,8 +2,10 @@ package io.ylab.walletservice.core.domain;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -11,7 +13,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-@Data
+@EqualsAndHashCode(exclude = "transactions")
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder

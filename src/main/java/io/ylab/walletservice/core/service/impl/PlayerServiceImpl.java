@@ -60,7 +60,6 @@ public class PlayerServiceImpl implements PlayerService<Long> {
     public List<Transaction> getTransactions(Long playerId) throws NotFoundException {
         Validator.validateId(playerId);
         Optional<Account> maybeAccount = accountService.findByPlayerId(playerId);
-
         if (maybeAccount.isPresent()) {
             return maybeAccount.get().getTransactions();
         } else {
@@ -72,8 +71,8 @@ public class PlayerServiceImpl implements PlayerService<Long> {
      * {@inheritDoc}
      */
     @Override
-    public void save(Player player) {
-        playerRepository.save(player);
+    public Player save(Player player) {
+        return playerRepository.save(player);
     }
 
     /**

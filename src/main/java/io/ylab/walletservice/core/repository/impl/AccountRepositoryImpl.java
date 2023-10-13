@@ -5,6 +5,7 @@ import io.ylab.walletservice.core.repository.AccountRepository;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -53,7 +54,7 @@ public class AccountRepositoryImpl implements AccountRepository<Long, Account> {
      */
     @Override
     public List<Account> findAll() {
-        return List.copyOf(accountsMap.values());
+        return new ArrayList<>(accountsMap.values());
     }
 
     /**

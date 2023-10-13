@@ -1,17 +1,15 @@
 package io.ylab.walletservice.core.service.command;
 
-import io.ylab.walletservice.core.domain.PlayerRole;
-import io.ylab.walletservice.core.domain.Account;
-import io.ylab.walletservice.core.domain.Currency;
-import io.ylab.walletservice.core.domain.Player;
 import io.ylab.walletservice.api.Auditor;
-import io.ylab.walletservice.util.DateTimeUtils;
 import io.ylab.walletservice.api.PasswordHasher;
+import io.ylab.walletservice.core.domain.Account;
+import io.ylab.walletservice.core.domain.Player;
+import io.ylab.walletservice.core.domain.PlayerRole;
+import io.ylab.walletservice.util.DateTimeUtils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.InputMismatchException;
@@ -48,15 +46,12 @@ public class CreateCommand implements Command {
             }
             System.out.println("Введите пароль:");
             String inputPassword = reader.readLine();
-
             Player createdPlayer = registerPlayer(inputName, role, PasswordHasher.hashPassword(inputPassword), birthDate);
             System.out.println("Аккаунт был успешно зарегистрирован.");
             Auditor.log("player: %s has been created".formatted(createdPlayer.getUsername()));
-        } catch (InputMismatchException | DateTimeParseException e) {
+        } catch (InputMismatchException | DateTimeParseException | NumberFormatException | IOException e) {
             System.err.println("Некорректный ввод, попробуйте снова");
             execute(player);
-        } catch (NumberFormatException | IOException e) {
-            throw new RuntimeException(e);
         }
     }
 
@@ -91,7 +86,6 @@ public class CreateCommand implements Command {
                 .currency(DEFAULT_CURRENCY)
                 .build();
         player.setAccount(playerAccount);
-
         playerService.save(player);
         accountService.save(playerAccount);
         return player;

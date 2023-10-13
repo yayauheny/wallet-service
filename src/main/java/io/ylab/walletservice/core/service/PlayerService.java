@@ -48,11 +48,12 @@ public interface PlayerService<K> {
     List<Transaction> getTransactions(K id) throws NotFoundException;
 
     /**
-     * Saves a new player entity.
+     * Saves a new player entity if it does not exist, otherwise returns the existing one.
      *
-     * @param player The player entity to save.
+     * @param player The {@link Player} entity to save.
+     * @return The saved or existing player entity.
      */
-    void save(Player player);
+    Player save(Player player);
 
     /**
      * Updates an existing player entity. Note: In this context, updating means modifying the existing entity,

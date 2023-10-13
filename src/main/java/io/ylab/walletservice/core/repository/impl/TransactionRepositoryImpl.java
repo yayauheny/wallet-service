@@ -6,11 +6,13 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 
 /**
@@ -23,7 +25,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class TransactionRepositoryImpl implements TransactionRepository<Long> {
 
     private static final int COLLECTION_DEFAULT_CAPACITY = 10;
-    private final Map<Long, Transaction> transactionsMap = new HashMap<>(COLLECTION_DEFAULT_CAPACITY);
+    private static final Map<Long, Transaction> transactionsMap = new HashMap<>(COLLECTION_DEFAULT_CAPACITY);
     private static final TransactionRepositoryImpl INSTANCE = new TransactionRepositoryImpl();
     private static final AtomicInteger idCounter = new AtomicInteger(0);
 
@@ -47,17 +49,17 @@ public class TransactionRepositoryImpl implements TransactionRepository<Long> {
         return transactionsMap.values().stream()
                 .filter(t -> t.getParticipantAccount().getId().equals(playerId))
                 .filter(t -> t.getCreatedAt().isAfter(from) && t.getCreatedAt().isBefore(to))
-                .toList();
+                .collect(Collectors.toCollection(ArrayList::new));
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public List<Transaction> findByAccountId(Long accountId) {
+    public List<Transaction> findAllByAccountId(Long accountId) {
         return transactionsMap.values().stream()
                 .filter(t -> t.getParticipantAccount().getId().equals(accountId))
-                .toList();
+                .collect(Collectors.toCollection(ArrayList::new));
     }
 
     /**
@@ -65,7 +67,7 @@ public class TransactionRepositoryImpl implements TransactionRepository<Long> {
      */
     @Override
     public List<Transaction> findAll() {
-        return List.copyOf(transactionsMap.values());
+        return new ArrayList<>(transactionsMap.values());
     }
 
     /**

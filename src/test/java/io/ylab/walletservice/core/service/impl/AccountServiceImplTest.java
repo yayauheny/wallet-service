@@ -4,7 +4,7 @@ import io.ylab.walletservice.core.domain.Account;
 import io.ylab.walletservice.core.repository.impl.AccountRepositoryImpl;
 import io.ylab.walletservice.exception.InvalidFundsException;
 import io.ylab.walletservice.exception.InvalidIdException;
-import io.ylab.walletservice.util.AccountTestBuilder;
+import io.ylab.walletservice.testutil.AccountTestBuilder;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,7 +16,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
-import static io.ylab.walletservice.util.TestObjectsUtil.TEST_ACCOUNT;
+import static io.ylab.walletservice.testutil.TestObjectsUtil.TEST_ACCOUNT;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -34,7 +34,6 @@ class AccountServiceImplTest {
     @Test
     @DisplayName("should find existing account by id")
     void shouldFindAccountById() {
-
         Long accountId = TEST_ACCOUNT.getId();
         Optional<Account> expectedAccount = Optional.of(TEST_ACCOUNT);
 
@@ -49,13 +48,12 @@ class AccountServiceImplTest {
     @Test
     @DisplayName("should return empty optional")
     void shouldReturnEmptyOptionalWhenAccountNotFound() {
-        Long id = TEST_ACCOUNT.getId();
         Optional<Account> expectedAccount = Optional.empty();
 
         doReturn(expectedAccount)
-                .when(accountRepository).findById(id);
+                .when(accountRepository).findById(any());
 
-        Optional<Account> actualResult = accountService.findById(id);
+        Optional<Account> actualResult = accountService.findById(0L);
 
         assertThat(actualResult).isEmpty();
     }
@@ -95,7 +93,7 @@ class AccountServiceImplTest {
 
         List<Account> actualResult = accountService.findAll();
 
-        assertThat(actualResult).hasSize(expectedSize).containsExactly(TEST_ACCOUNT);
+        assertThat(actualResult).hasSize(expectedSize).containsExactlyInAnyOrder(TEST_ACCOUNT);
     }
 
     @Test
@@ -119,7 +117,6 @@ class AccountServiceImplTest {
 
         assertThat(actualResult).isNotNull().isEqualTo(TEST_ACCOUNT);
     }
-//update, updateBalance, delete
 
     @Test
     @DisplayName("should update existing account")
@@ -133,16 +130,20 @@ class AccountServiceImplTest {
                 .withPlayerId(account.getPlayerId())
                 .withCurrentBalance(new BigDecimal("500"))
                 .build();
+        Optional<Account> expected = Optional.of(updatedAccount);
 
         doReturn(account)
-                .when(accountRepository).save(any());
+                .when(accountRepository).save(account);
+
         accountService.save(account);
         accountService.update(updatedAccount);
-        doReturn(Optional.of(updatedAccount))
+
+        doReturn(expected)
                 .when(accountRepository).findById(updatedAccount.getId());
+
         Optional<Account> actualResult = accountService.findById(updatedAccount.getId());
 
-        assertThat(actualResult).isPresent().isEqualTo(Optional.of(updatedAccount));
+        assertThat(actualResult).isPresent().isEqualTo(expected);
     }
 
     @Test
@@ -153,14 +154,17 @@ class AccountServiceImplTest {
                 .withPlayerId(100L)
                 .withCurrentBalance(BigDecimal.ZERO)
                 .build();
-        BigDecimal updatedBalance = account.getCurrentBalance().add(new BigDecimal("600"));
+        BigDecimal updatedBalance = account.getCurrentBalance()
+                .add(new BigDecimal("600"));
 
         doReturn(account)
                 .when(accountRepository).save(account);
-        Account savedAccount = accountService.save(account);
-        accountService.updateBalance(savedAccount, updatedBalance);
-        assertThat(savedAccount).isNotNull().isEqualTo(account);
-        assertThat(savedAccount.getCurrentBalance()).isEqualTo(updatedBalance.toString());
+
+        Account actualResult = accountService.save(account);
+        accountService.updateBalance(actualResult, updatedBalance);
+
+        assertThat(actualResult).isNotNull().isEqualTo(account);
+        assertThat(actualResult.getCurrentBalance()).isEqualTo(updatedBalance.toString());
     }
 
     @Test

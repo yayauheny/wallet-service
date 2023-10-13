@@ -59,9 +59,8 @@ public class ConsoleRunner {
                     }
                 }
                 case 2 -> {
-                    if (register()) {
-                        authorize(currentPlayer);
-                    }
+                    register();
+                    authorize(currentPlayer);
                 }
                 case 3 -> System.out.println("Выход из приложения");
                 default -> throw new InputMismatchException();
@@ -83,7 +82,6 @@ public class ConsoleRunner {
             authenticate();
         }
         Auditor.log("player: %s have been authorized".formatted(currentPlayer.getUsername()));
-
         System.out.println("\nСписок доступных действий:");
         List<Command> commands = PermissionsManager.getCommands(currentPlayer.getRole());
         for (int i = 0; i < commands.size(); i++) {
@@ -95,7 +93,6 @@ public class ConsoleRunner {
         System.out.println("Введите команду:");
         try {
             int choice = Integer.parseInt(reader.readLine());
-
             if (choice == exitNumber) {
                 System.out.println("Завершение работы...");
             } else if (choice == exitFromAccountNumber) {
@@ -136,8 +133,8 @@ public class ConsoleRunner {
      *
      * @return The newly registered player.
      */
-    private static boolean register() {
-        return registerNewPlayer();
+    private static void register() {
+        registerNewPlayer();
     }
 
     /**
@@ -172,10 +169,9 @@ public class ConsoleRunner {
      *
      * @return The newly registered player.
      */
-    private static boolean registerNewPlayer() {
+    private static void registerNewPlayer() {
         Command command = new CreateCommand();
         command.execute(null);
-        return true;
     }
 }
 

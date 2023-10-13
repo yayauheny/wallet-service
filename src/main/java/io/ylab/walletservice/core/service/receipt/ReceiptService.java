@@ -40,7 +40,6 @@ public abstract class ReceiptService {
     public String buildReceipt(Receipt receipt) {
         String completedReceipt = buildTemplate(receipt);
         saveReceiptAsTxt(completedReceipt);
-
         return completedReceipt;
     }
 
@@ -90,7 +89,6 @@ public abstract class ReceiptService {
      */
     private String buildTransactionEnd(List<Transaction> transactions) {
         StringBuilder sb = new StringBuilder();
-
         for (Transaction transaction : transactions) {
             String transactionTemplate = "%s | %s | %s\n";
             String positiveAmount = StringUtils.rightPad(transaction.getAmount()

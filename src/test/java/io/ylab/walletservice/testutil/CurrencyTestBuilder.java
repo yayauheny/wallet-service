@@ -1,4 +1,4 @@
-package io.ylab.walletservice.util;
+package io.ylab.walletservice.testutil;
 
 import io.ylab.walletservice.core.domain.Currency;
 import lombok.AllArgsConstructor;

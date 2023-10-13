@@ -29,7 +29,6 @@ public class CurrencyServiceImpl implements CurrencyService<Long> {
     @Override
     public Optional<Currency> findById(Long id) {
         Validator.validateId(id);
-
         return currencyRepository.findById(id);
     }
 

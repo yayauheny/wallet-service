@@ -62,7 +62,7 @@ public class TransactionServiceImpl implements TransactionService<Long> {
     @Override
     public List<Transaction> findAllByAccountId(Long accountId) {
         Validator.validateId(accountId);
-        return transactionRepository.findByAccountId(accountId);
+        return transactionRepository.findAllByAccountId(accountId);
     }
 
     /**
@@ -72,7 +72,6 @@ public class TransactionServiceImpl implements TransactionService<Long> {
     public Transaction save(Transaction transaction, Account account) {
         transaction.setParticipantAccount(account);
         Validator.validateTransaction(transaction);
-
         account.getTransactions().add(transaction);
         return transactionRepository.save(transaction);
     }
@@ -84,10 +83,10 @@ public class TransactionServiceImpl implements TransactionService<Long> {
     public void processTransactionAndUpdateAccount(Transaction transaction, Account account) {
         transaction.setParticipantAccount(account);
         Validator.validateTransaction(transaction);
-        if (findById(transaction.getId()).isPresent()) {
-            throw new TransactionException("Transaction id is not uniqie, please, provide another id");
+        Optional<Transaction> maybeTransaction = findById(transaction.getId());
+        if (maybeTransaction.isPresent()) {
+            throw new TransactionException("Transaction id is not unique, please, provide another id");
         }
-
         BigDecimal updatedBalance;
         switch (transaction.getType()) {
             case CREDIT -> updatedBalance = account.getCurrentBalance().add(transaction.getAmount());
