@@ -19,13 +19,15 @@ public class Auditor {
     private final Queue<String> LOG = new ArrayDeque<>();
 
     /**
-     * Logs a message.
+     * Logs a messages.
      *
-     * @param message The message to log.
+     * @param messages The messages to log.
      */
-    public void log(String message) {
-        String formattedMessage = String.format("[%s] %s", LocalDateTime.now(), message);
-        LOG.add(formattedMessage);
+    public void log(String... messages) {
+        for (String message : messages) {
+            String formattedMessage = String.format("[%s] %s", LocalDateTime.now(), message);
+            LOG.add(formattedMessage);
+        }
     }
 
     /**
@@ -40,8 +42,8 @@ public class Auditor {
     /**
      * Removes the first log message from the queue.
      */
-    public void remove() {
-        LOG.remove();
+    public void clear() {
+        LOG.clear();
     }
 
     /**
