@@ -43,13 +43,13 @@ public class SummaryReceiptService extends ReceiptService {
                 %s : %s
                 %s
                 %s
-                """.formatted(StringUtils.center("История транзакций", 80),
+                """.formatted(StringUtils.center("РСЃС‚РѕСЂРёСЏ С‚СЂР°РЅР·Р°РєС†РёР№", 70),
                 SEPARATOR,
-                StringUtils.rightPad("Игрок", 37),
+                StringUtils.rightPad("РРіСЂРѕРє", 39),
                 receipt.player().getUsername(),
-                StringUtils.rightPad("Период", 39),
-                (DateTimeUtils.parseDate(receipt.from()) + "-" + DateTimeUtils.parseDate(receipt.to())),
-                StringUtils.rightPad("Дата и время формирования", 55),
+                StringUtils.rightPad("РџРµСЂРёРѕРґ", 39),
+                (DateTimeUtils.parseDate(receipt.from()) + " - " + DateTimeUtils.parseDate(receipt.to())),
+                StringUtils.rightPad("Р”Р°С‚Р° Рё РІСЂРµРјСЏ С„РѕСЂРјРёСЂРѕРІР°РЅРёСЏ", 39),
                 (DateTimeUtils.parseCurrentDate() + ", " + DateTimeUtils.parseCurrentTime()),
                 SEPARATOR,
                 buildTransactionBody(receipt)

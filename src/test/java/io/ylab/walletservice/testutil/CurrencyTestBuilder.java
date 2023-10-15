@@ -7,7 +7,6 @@ import lombok.With;
 
 import java.math.BigDecimal;
 
-
 @AllArgsConstructor
 @NoArgsConstructor(staticName = "aCurrency")
 @With

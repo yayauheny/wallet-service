@@ -5,16 +5,16 @@ import io.ylab.walletservice.core.domain.Account;
 import io.ylab.walletservice.core.domain.Currency;
 import io.ylab.walletservice.core.repository.impl.AccountRepositoryImpl;
 import io.ylab.walletservice.api.Validator;
+import io.ylab.walletservice.exception.InvalidIdException;
 import lombok.AllArgsConstructor;
 
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
-
 /**
- * The implementation of the {@link io.ylab.walletservice.core.service.AccountService} interface.
- * Provides methods for interacting with {@link io.ylab.walletservice.core.domain.Account} entities.
+ * The implementation of the {@link AccountService} interface.
+ * Provides methods for interacting with {@link Account} entities.
  */
 @AllArgsConstructor
 public class AccountServiceImpl implements AccountService<Long> {
@@ -31,11 +31,11 @@ public class AccountServiceImpl implements AccountService<Long> {
     }
 
     /**
-     * Retrieves an {@link io.ylab.walletservice.core.domain.Account} by its unique identifier.
+     * Retrieves an {@link Account} by its unique identifier.
      *
      * @param id The unique identifier of the account to find.
      * @return An {@link Optional} containing the found account, or an empty {@link Optional} if not found.
-     * @throws io.ylab.walletservice.exception.InvalidIdException if the provided {@code id} is null or less than or equal to zero.
+     * @throws InvalidIdException if the provided {@code id} is null or less than or equal to zero.
      */
     @Override
     public Optional<Account> findById(Long id) {
@@ -49,7 +49,7 @@ public class AccountServiceImpl implements AccountService<Long> {
      *
      * @param playerId The unique identifier of the player associated with the account to find.
      * @return An {@link Optional} containing the found account, or an empty {@link Optional} if not found.
-     * @throws io.ylab.walletservice.exception.InvalidIdException if the provided {@code playerId} is null or less than or equal to zero.
+     * @throws InvalidIdException if the provided {@code playerId} is null or less than or equal to zero.
      */
     @Override
     public Optional<Account> findByPlayerId(Long playerId) {

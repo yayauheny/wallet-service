@@ -15,16 +15,15 @@ import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Optional;
 
-
 /**
  * The {@link ConsoleRunner} class serves as the entry point for the console-based user interface.
  * It allows users to authenticate, register, and execute various commands based on their roles.
  */
 public class ConsoleRunner {
 
-    private static final PlayerServiceImpl playerService = new PlayerServiceImpl();
-    private static BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+    private static final BufferedReader READER = new BufferedReader(new InputStreamReader(System.in));
     private static final String INCORRECT_INPUT = "Некорректный ввод, попробуйте снова";
+    private static PlayerServiceImpl playerService = new PlayerServiceImpl();
     private static Player currentPlayer;
 
     /**
@@ -32,9 +31,13 @@ public class ConsoleRunner {
      *
      * @param args Command line arguments (not used).
      */
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
         authenticate();
-        reader.close();
+        try {
+            READER.close();
+        } catch (IOException e) {
+            System.err.println(e.getMessage());
+        }
     }
 
     /**
@@ -51,7 +54,8 @@ public class ConsoleRunner {
                 """;
         try {
             System.out.println(authMessage);
-            int choice = Integer.parseInt(reader.readLine());
+            int choice = Integer.parseInt(READER.readLine());
+
             switch (choice) {
                 case 1 -> {
                     if (login()) {
@@ -81,6 +85,7 @@ public class ConsoleRunner {
         if (currentPlayer == null) {
             authenticate();
         }
+
         Auditor.log("player: %s have been authorized".formatted(currentPlayer.getUsername()));
         System.out.println("\nСписок доступных действий:");
         List<Command> commands = PermissionsManager.getCommands(currentPlayer.getRole());
@@ -90,9 +95,10 @@ public class ConsoleRunner {
         int exitNumber = commands.size() + 1;
         int exitFromAccountNumber = commands.size() + 2;
         System.out.println(exitNumber + " - выйти\n" + exitFromAccountNumber + " - выйти из аккаунта");
+
         System.out.println("Введите команду:");
         try {
-            int choice = Integer.parseInt(reader.readLine());
+            int choice = Integer.parseInt(READER.readLine());
             if (choice == exitNumber) {
                 System.out.println("Завершение работы...");
             } else if (choice == exitFromAccountNumber) {
@@ -104,9 +110,12 @@ public class ConsoleRunner {
             } else {
                 throw new IllegalArgumentException();
             }
-        } catch (IOException | IllegalArgumentException e) {
+        } catch (IllegalArgumentException e) {
+            System.err.println(e);
             System.err.println(INCORRECT_INPUT);
             authorize(currentPlayer);
+        } catch (IOException e) {
+            System.err.println(e);
         }
     }
 
@@ -118,9 +127,9 @@ public class ConsoleRunner {
     private static boolean login() {
         try {
             System.out.println("Введите логин:");
-            String loginInput = reader.readLine();
+            String loginInput = READER.readLine();
             System.out.println("Введите пароль:");
-            String password = reader.readLine();
+            String password = READER.readLine();
             return processLoginCredentials(loginInput, password);
         } catch (InputMismatchException | IOException e) {
             System.err.println(INCORRECT_INPUT);
@@ -147,9 +156,11 @@ public class ConsoleRunner {
     private static boolean processLoginCredentials(String username, String inputPassword) {
         Optional<Player> maybePlayer = playerService.findByUsername(username);
         boolean isVerified = false;
+
         if (maybePlayer.isPresent()) {
             Player player = maybePlayer.get();
             byte[] originalPassword = player.getHashedPassword();
+
             if (PasswordHasher.checkPassword(inputPassword, originalPassword)) {
                 currentPlayer = player;
                 isVerified = true;

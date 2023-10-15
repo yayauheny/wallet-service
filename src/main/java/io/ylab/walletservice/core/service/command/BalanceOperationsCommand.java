@@ -8,12 +8,9 @@ import io.ylab.walletservice.core.domain.TransactionType;
 import io.ylab.walletservice.core.service.impl.TransactionServiceImpl;
 import io.ylab.walletservice.exception.TransactionException;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.util.InputMismatchException;
-
 
 /**
  * The {@link BalanceOperationsCommand} class is an implementation of the {@link Command} interface,
@@ -32,8 +29,7 @@ public class BalanceOperationsCommand implements Command {
     public void execute(Player player) {
         System.out.println("Выберите операцию:\n1 - пополнение средств\n2 - снятие средств");
         try {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-            byte operation = Byte.parseByte(reader.readLine());
+            byte operation = Byte.parseByte(READER.readLine());
             switch (operation) {
                 case 1 -> credit(player);
                 case 2 -> debit(player);
@@ -80,16 +76,17 @@ public class BalanceOperationsCommand implements Command {
      */
     private void buildTransaction(Player player, TransactionType transactionType) {
         Account account = player.getAccount();
+
         switch (transactionType) {
             case DEBIT -> System.out.println(String.format("Введите сумму (%s) списания:", DEFAULT_CURRENCY.getCode()));
             case CREDIT ->
                     System.out.println(String.format("Введите сумму (%s) пополнения:", DEFAULT_CURRENCY.getCode()));
         }
+
         try {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-            BigDecimal inputAmount = BigDecimal.valueOf(Long.parseLong(reader.readLine()));
+            BigDecimal inputAmount = BigDecimal.valueOf(Long.parseLong(READER.readLine()));
             System.out.println("Введите уникальный номер транзакции (id)");
-            long inputId = Long.parseLong(reader.readLine());
+            long inputId = Long.parseLong(READER.readLine());
             Transaction transaction = Transaction.builder()
                     .id(inputId)
                     .amount(inputAmount)
@@ -98,8 +95,9 @@ public class BalanceOperationsCommand implements Command {
                     .currency(DEFAULT_CURRENCY)
                     .build();
             transactionService.processTransactionAndUpdateAccount(transaction, account);
+
             System.out.println("Транзакция прошла успешно, текущий баланс: " + account.getCurrentBalance());
-            Auditor.log(String.format("player: %s commited transaction: %s",
+            Auditor.log(String.format("player: %s committed transaction: %s",
                     player.getUsername(), transactionType + ": " + transaction.getAmount() + transaction.getCurrency().getCode()));
         } catch (InputMismatchException | IOException e) {
             System.err.println("Некорректный ввод, попробуйте снова");

@@ -30,7 +30,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 
-
 @ExtendWith(MockitoExtension.class)
 class TransactionServiceImplTest {
 
@@ -171,22 +170,17 @@ class TransactionServiceImplTest {
     }
 
     @Test
-    @DisplayName("should delete Transaction")
+    @DisplayName("should delete transaction")
     void shouldDeleteTransaction() {
-//        Transaction Transaction = TransactionTestBuilder.aTransaction()
-//                .withId(100L)
-//                .withUsername("test-name")
-//                .build();
-//
-//        doReturn(Transaction)
-//                .when(transactionRepository).save(Transaction);
-//        doReturn(Optional.empty())
-//                .when(transactionRepository).findById(Transaction.getId());
-//
-//        Transaction savedTransaction = transactionService.save(Transaction);
-//        Optional<Transaction> actualResult = transactionService.findById(Transaction.getId());
-//
-//        assertThat(savedTransaction).isNotNull().isEqualTo(Transaction);
-//        assertThat(actualResult).isEmpty();
+        doReturn(TEST_TRANSACTION)
+                .when(transactionRepository).save(TEST_TRANSACTION);
+        doReturn(Optional.empty())
+                .when(transactionRepository).findById(TEST_TRANSACTION.getId());
+
+        Transaction savedTransaction = transactionService.save(TEST_TRANSACTION, TEST_ACCOUNT);
+        Optional<Transaction> actualResult = transactionService.findById(TEST_TRANSACTION.getId());
+
+        assertThat(savedTransaction).isNotNull().isEqualTo(TEST_TRANSACTION);
+        assertThat(actualResult).isEmpty();
     }
 }

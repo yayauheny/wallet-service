@@ -1,15 +1,20 @@
 package io.ylab.walletservice.core.service.receipt;
 
-import io.ylab.walletservice.core.service.impl.TransactionServiceImpl;
+import io.ylab.walletservice.api.Validator;
 import io.ylab.walletservice.core.domain.Receipt;
 import io.ylab.walletservice.core.domain.Transaction;
 import io.ylab.walletservice.core.domain.TransactionType;
+import io.ylab.walletservice.core.service.impl.TransactionServiceImpl;
+import io.ylab.walletservice.exception.ReceiptBuildingException;
 import io.ylab.walletservice.util.DateTimeUtils;
 import org.apache.commons.lang3.StringUtils;
-import io.ylab.walletservice.api.Validator;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 
 /**
@@ -25,6 +30,7 @@ public abstract class ReceiptService {
             Map.entry(TransactionType.DEBIT, "Снятие"),
             Map.entry(TransactionType.CREDIT, "Пополнение")
     );
+    private static AtomicInteger receiptCounter = new AtomicInteger(0);
 
     /**
      * A separator used in the receipt template.
@@ -36,6 +42,7 @@ public abstract class ReceiptService {
      *
      * @param receipt The receipt to build.
      * @return The completed receipt.
+     * @throws ReceiptBuildingException if exception caused while saving receipt to the file.
      */
     public String buildReceipt(Receipt receipt) {
         String completedReceipt = buildTemplate(receipt);
@@ -47,9 +54,23 @@ public abstract class ReceiptService {
      * Saves the receipt as a text file.
      *
      * @param receipt The receipt to save.
+     * @throws ReceiptBuildingException if exception caused while saving receipt to the file.
      */
     private void saveReceiptAsTxt(String receipt) {
-        // Perform the save operation.
+        try {
+            Path directoryPath = Paths.get("tickets").toAbsolutePath();
+            Files.createDirectories(directoryPath);
+
+            Path filePath = Path.of(String.format("tickets/ticket_%s.txt", receiptCounter.incrementAndGet()));
+
+            if (Files.notExists(filePath)) {
+                Files.createFile(filePath);
+            }
+            Files.writeString(filePath, receipt);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new ReceiptBuildingException("Cannot write receipt to the file");
+        }
     }
 
     /**
@@ -74,8 +95,8 @@ public abstract class ReceiptService {
                 %s | %s | %s
                 %s
                 %s
-                """.formatted(StringUtils.center("Дата", 16),
-                StringUtils.center("Примечание", 49),
+                """.formatted(StringUtils.center("Дата", 12),
+                StringUtils.center("Примечание", 39),
                 StringUtils.rightPad("Сумма", 16),
                 SEPARATOR,
                 transactionEnd);
@@ -98,7 +119,7 @@ public abstract class ReceiptService {
             switch (transaction.getType()) {
                 case CREDIT ->
                         sb.append(transactionTemplate.formatted(StringUtils.center(DateTimeUtils.parseDate(transaction.getCreatedAt()), 12),
-                                StringUtils.rightPad(TRANSACTION_TYPE_MAP.get(TransactionType.CREDIT), 48),
+                                StringUtils.rightPad(TRANSACTION_TYPE_MAP.get(TransactionType.CREDIT), 39),
                                 positiveAmount));
                 case DEBIT ->
                         sb.append(transactionTemplate.formatted(StringUtils.center(DateTimeUtils.parseDate(transaction.getCreatedAt()), 12),

@@ -7,9 +7,7 @@ import io.ylab.walletservice.core.domain.Player;
 import io.ylab.walletservice.core.domain.PlayerRole;
 import io.ylab.walletservice.util.DateTimeUtils;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.InputMismatchException;
@@ -31,21 +29,22 @@ public class CreateCommand implements Command {
         System.out.println("Регистрация нового игрока:");
         System.out.println("Введите имя:");
         try {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-            String inputName = reader.readLine();
+            String inputName = READER.readLine();
             System.out.println("Введите дату рождения (гггг.мм.дд)");
-            String inputDate = reader.readLine();
+            String inputDate = READER.readLine();
             LocalDate birthDate = LocalDate.parse(inputDate, DateTimeUtils.dateFormatter);
             System.out.println("Выберите роль игрока:\n1 - пользователь\n2 - администратор");
-            int inputRole = Integer.parseInt(reader.readLine());
+            int inputRole = Integer.parseInt(READER.readLine());
             PlayerRole role;
+
             switch (inputRole) {
                 case 1 -> role = PlayerRole.USER;
                 case 2 -> role = PlayerRole.ADMIN;
                 default -> throw new InputMismatchException();
             }
+
             System.out.println("Введите пароль:");
-            String inputPassword = reader.readLine();
+            String inputPassword = READER.readLine();
             Player createdPlayer = registerPlayer(inputName, role, PasswordHasher.hashPassword(inputPassword), birthDate);
             System.out.println("Аккаунт был успешно зарегистрирован.");
             Auditor.log("player: %s has been created".formatted(createdPlayer.getUsername()));

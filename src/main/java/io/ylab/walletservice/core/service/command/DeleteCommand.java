@@ -1,11 +1,9 @@
 package io.ylab.walletservice.core.service.command;
 
-import io.ylab.walletservice.core.domain.Player;
 import io.ylab.walletservice.api.Auditor;
+import io.ylab.walletservice.core.domain.Player;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Optional;
@@ -46,8 +44,7 @@ public class DeleteCommand implements Command {
     private void deletePlayer(List<Player> players) {
         System.out.println("Введите идентификатор пользователя для удаления:");
         try {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-            long idFromConsole = Long.parseLong(reader.readLine());
+            long idFromConsole = Long.parseLong(READER.readLine());
             Optional<Player> maybePlayer = players.stream().filter(p -> p.getId().equals(idFromConsole)).findAny();
 
             if (maybePlayer.isPresent()) {

@@ -20,7 +20,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 
-
 @ExtendWith(MockitoExtension.class)
 class CurrencyServiceImplTest {
 
@@ -96,9 +95,9 @@ class CurrencyServiceImplTest {
         doReturn(TEST_CURRENCY)
                 .when(currencyRepository).save(TEST_CURRENCY);
 
-        Currency actualResult = currencyService.save(TEST_CURRENCY);
+        Currency savedCurrency = currencyService.save(TEST_CURRENCY);
 
-        assertThat(actualResult).isNotNull().isEqualTo(TEST_CURRENCY);
+        assertThat(savedCurrency).isNotNull().isEqualTo(TEST_CURRENCY);
     }
 
     @Test
@@ -125,5 +124,18 @@ class CurrencyServiceImplTest {
         Optional<Currency> actualResult = currencyService.findById(updatedCurrency.getId());
 
         assertThat(actualResult).isPresent().isEqualTo(Optional.of(updatedCurrency));
+    }
+
+    @Test
+    @DisplayName("should delete currency")
+    void shouldDeleteCurrency() {
+        doReturn(TEST_CURRENCY)
+                .when(currencyRepository).save(TEST_CURRENCY);
+
+        Currency savedCurrency = currencyService.save(TEST_CURRENCY);
+        currencyService.delete(savedCurrency);
+        Optional<Currency> emptyCurrency = currencyService.findById(savedCurrency.getId());
+
+        assertThat(emptyCurrency).isEmpty();
     }
 }

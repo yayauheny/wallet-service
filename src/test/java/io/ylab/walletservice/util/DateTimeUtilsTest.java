@@ -10,7 +10,6 @@ import java.time.format.DateTimeFormatter;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-
 class DateTimeUtilsTest {
 
     @Test

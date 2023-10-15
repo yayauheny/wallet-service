@@ -2,8 +2,6 @@ plugins {
     id 'java'
     id "io.freefair.lombok" version "8.3"
 }
-//compileJava.options.encoding = 'UTF-8'
-//compileTestJava.options.encoding = 'UTF-8'
 group = 'yayauheny'
 version = '1.0-SNAPSHOT'
 

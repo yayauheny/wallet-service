@@ -84,9 +84,11 @@ public class TransactionServiceImpl implements TransactionService<Long> {
         transaction.setParticipantAccount(account);
         Validator.validateTransaction(transaction);
         Optional<Transaction> maybeTransaction = findById(transaction.getId());
+
         if (maybeTransaction.isPresent()) {
             throw new TransactionException("Transaction id is not unique, please, provide another id");
         }
+
         BigDecimal updatedBalance;
         switch (transaction.getType()) {
             case CREDIT -> updatedBalance = account.getCurrentBalance().add(transaction.getAmount());

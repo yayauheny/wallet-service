@@ -1,13 +1,11 @@
 package io.ylab.walletservice.core.service.command;
 
-import io.ylab.walletservice.core.domain.PlayerRole;
-import io.ylab.walletservice.core.domain.Player;
 import io.ylab.walletservice.api.Auditor;
+import io.ylab.walletservice.core.domain.Player;
+import io.ylab.walletservice.core.domain.PlayerRole;
 import io.ylab.walletservice.util.DateTimeUtils;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.InputMismatchException;
@@ -39,7 +37,7 @@ public class EditCommand implements Command {
      */
     @Override
     public String getName() {
-        return "Изменение игрока";
+        return "РР·РјРµРЅРµРЅРёРµ РёРіСЂРѕРєР°";
     }
 
     /**
@@ -48,10 +46,9 @@ public class EditCommand implements Command {
      * @param players The list of players to choose from.
      */
     private void readIdFromConsole(List<Player> players) {
-        System.out.println("Введите идентификатор пользователя для изменения:");
+        System.out.println("Р’РІРµРґРёС‚Рµ РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ РґР»СЏ РёР·РјРµРЅРµРЅРёСЏ:");
         try {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-            long idFromConsole = Long.parseLong(reader.readLine());
+            long idFromConsole = Long.parseLong(READER.readLine());
             Optional<Player> maybePlayer = players.stream().filter(p -> p.getId().equals(idFromConsole)).findAny();
 
             if (maybePlayer.isPresent()) {
@@ -60,7 +57,7 @@ public class EditCommand implements Command {
                 throw new InputMismatchException();
             }
         } catch (InputMismatchException | IOException e) {
-            System.err.println("Некорректный ввод, попробуйте снова");
+            System.err.println("РќРµРєРѕСЂСЂРµРєС‚РЅС‹Р№ РІРІРѕРґ, РїРѕРїСЂРѕР±СѓР№С‚Рµ СЃРЅРѕРІР°");
             readIdFromConsole(players);
         }
     }
@@ -71,27 +68,26 @@ public class EditCommand implements Command {
      * @param player The player to be updated.
      */
     private void updatePlayer(Player player) {
-        System.out.println("Изменить поля:\n1 - имя\n2 - дата рождения\n3 - роль");
+        System.out.println("РР·РјРµРЅРёС‚СЊ РїРѕР»СЏ:\n1 - РёРјСЏ\n2 - РґР°С‚Р° СЂРѕР¶РґРµРЅРёСЏ\n3 - СЂРѕР»СЊ");
         try {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-            byte choice = Byte.parseByte(reader.readLine());
+            byte choice = Byte.parseByte(READER.readLine());
             switch (choice) {
                 case 1 -> {
-                    System.out.println("Введите новое имя:");
-                    String inputName = reader.readLine();
+                    System.out.println("Р’РІРµРґРёС‚Рµ РЅРѕРІРѕРµ РёРјСЏ:");
+                    String inputName = READER.readLine();
                     player.setUsername(inputName);
                     playerService.update(player);
                 }
                 case 2 -> {
-                    System.out.println("Введите новую дату рождения (гггг.мм.дд):");
-                    String inputDate = reader.readLine();
+                    System.out.println("Р’РІРµРґРёС‚Рµ РЅРѕРІСѓСЋ РґР°С‚Сѓ СЂРѕР¶РґРµРЅРёСЏ (РіРіРіРі.РјРј.РґРґ):");
+                    String inputDate = READER.readLine();
                     LocalDate date = LocalDate.parse(inputDate, DateTimeUtils.dateFormatter);
                     player.setBirthDate(date);
                     playerService.update(player);
                 }
                 case 3 -> {
-                    System.out.println("Выберите роль игрока:\n1 - пользователь\n2 - администратор");
-                    byte inputRole = Byte.parseByte(reader.readLine());
+                    System.out.println("Р’С‹Р±РµСЂРёС‚Рµ СЂРѕР»СЊ РёРіСЂРѕРєР°:\n1 - РїРѕР»СЊР·РѕРІР°С‚РµР»СЊ\n2 - Р°РґРјРёРЅРёСЃС‚СЂР°С‚РѕСЂ");
+                    byte inputRole = Byte.parseByte(READER.readLine());
                     switch (inputRole) {
                         case 1 -> {
                             player.setRole(PlayerRole.USER);
@@ -100,10 +96,10 @@ public class EditCommand implements Command {
                     }
                 }
             }
-            System.out.println("Данные изменены");
+            System.out.println("Р”Р°РЅРЅС‹Рµ РёР·РјРµРЅРµРЅС‹");
             Auditor.log("player: %s info have been changed".formatted(player.getUsername()));
         } catch (InputMismatchException | DateTimeParseException | IOException e) {
-            System.err.println("Некорректный ввод, попробуйте снова");
+            System.err.println("РќРµРєРѕСЂСЂРµРєС‚РЅС‹Р№ РІРІРѕРґ, РїРѕРїСЂРѕР±СѓР№С‚Рµ СЃРЅРѕРІР°");
             updatePlayer(player);
         }
     }

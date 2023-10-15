@@ -28,7 +28,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 
-
 @ExtendWith(MockitoExtension.class)
 class PlayerServiceImplTest {
 
@@ -186,6 +185,7 @@ class PlayerServiceImplTest {
                 .when(playerRepository).findById(player.getId());
 
         Player savedPlayer = playerService.save(player);
+        playerService.delete(player);
         Optional<Player> actualResult = playerService.findById(player.getId());
 
         assertThat(savedPlayer).isNotNull().isEqualTo(player);

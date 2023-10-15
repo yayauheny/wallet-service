@@ -1,15 +1,11 @@
 package io.ylab.walletservice.api;
 
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.Queue;
 
 import static org.assertj.core.api.Assertions.*;
-
 
 class AuditorTest {
 

@@ -6,6 +6,8 @@ import io.ylab.walletservice.core.domain.Player;
 import io.ylab.walletservice.core.service.impl.AccountServiceImpl;
 import io.ylab.walletservice.core.service.impl.PlayerServiceImpl;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -21,6 +23,7 @@ public interface Command {
             .rate(BigDecimal.ONE)
             .code("USD")
             .build();
+    BufferedReader READER = new BufferedReader(new InputStreamReader(System.in));
     PlayerServiceImpl playerService = new PlayerServiceImpl();
     AccountServiceImpl accountService = new AccountServiceImpl();
 
@@ -28,10 +31,10 @@ public interface Command {
      * The format for displaying player information.
      */
     String PLAYER_FORMAT = """
-            Идентификатор: %s
-            Имя: %s
-            Дата рождения: %s
-            Роль: %s\n
+            РРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ: %s
+            РРјСЏ: %s
+            Р”Р°С‚Р° СЂРѕР¶РґРµРЅРёСЏ: %s
+            Р РѕР»СЊ: %s\n
             """;
 
     /**
@@ -54,7 +57,7 @@ public interface Command {
      * @return The list of all players.
      */
     default List<Player> printAllPlayers() {
-        System.out.println("Список пользователей:");
+        System.out.println("РЎРїРёСЃРѕРє РїРѕР»СЊР·РѕРІР°С‚РµР»РµР№:");
         List<Player> players = playerService.findAll();
         for (Player player : players) {
             System.out.println(String.format(PLAYER_FORMAT,

@@ -8,10 +8,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-
 
 @EqualsAndHashCode(exclude = "transactions")
 @Getter
@@ -29,5 +28,5 @@ public class Account {
     private Currency currency;
     private Long playerId;
     @Builder.Default
-    private LocalDate createdAt = LocalDate.now();
+    private LocalDateTime createdAt = LocalDateTime.now();
 }

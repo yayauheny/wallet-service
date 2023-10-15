@@ -28,7 +28,7 @@ public class Validator {
      *
      * @param id  The ID to validate.
      * @param <T> The type of the ID (Number).
-     * @throws io.ylab.walletservice.exception.InvalidIdException If the ID is null or negative.
+     * @throws InvalidIdException If the ID is null or negative.
      */
     public <T extends Number> void validateId(T id) {
         if (id == null || id.intValue() < 0) {
@@ -41,7 +41,7 @@ public class Validator {
      * the debit transaction does not exceed the participant's balance.
      *
      * @param transaction The transaction to validate.
-     * @throws io.ylab.walletservice.exception.TransactionException If the transaction amount is negative or exceeds the balance for debit transactions.
+     * @throws TransactionException If the transaction amount is negative or exceeds the balance for debit transactions.
      */
     public void validateTransactionFunds(Transaction transaction) {
         BigDecimal participantBalance = transaction.getParticipantAccount().getCurrentBalance();
@@ -58,7 +58,7 @@ public class Validator {
      * Validates that the amount in a transaction is non-negative.
      *
      * @param amount The amount to validate.
-     * @throws io.ylab.walletservice.exception.InvalidFundsException If the amount is negative.
+     * @throws InvalidFundsException If the amount is negative.
      */
     public void validateAmount(BigDecimal amount) {
         if (amount.compareTo(BigDecimal.ZERO) < 0) {
@@ -71,7 +71,7 @@ public class Validator {
      *
      * @param from The start date.
      * @param to   The end date.
-     * @throws io.ylab.walletservice.exception.IncorrectPeriodException If the period is incorrectly specified.
+     * @throws IncorrectPeriodException If the period is incorrectly specified.
      */
     public void validateTransactionsPeriod(LocalDateTime from, LocalDateTime to) {
         String exceptionMessage = "Incorrect period has been passed";
@@ -122,7 +122,7 @@ public class Validator {
      * Validates a receipt for basic information, ensuring that key components are not null.
      *
      * @param receipt The receipt to validate.
-     * @throws io.ylab.walletservice.exception.ReceiptBuildingException If the receipt is missing essential information.
+     * @throws ReceiptBuildingException If the receipt is missing essential information.
      */
     public void validateReceiptForCheck(Receipt receipt) {
         if (receipt.account() == null || receipt.player() == null || receipt.from() == null || receipt.to() == null) {

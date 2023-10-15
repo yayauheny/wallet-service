@@ -12,7 +12,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 
-
 /**
  * The {@link PlayerRepositoryImpl} class implements the {@code PlayerRepository} interface
  * for accessing and manipulating player entities in a repository using an in-memory map.
@@ -23,7 +22,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class PlayerRepositoryImpl implements PlayerRepository<Long, Player> {
 
     private static final int COLLECTION_DEFAULT_CAPACITY = 10;
-    private final Map<Long, Player> playersMap = new HashMap<>(COLLECTION_DEFAULT_CAPACITY);
+    private static  final Map<Long, Player> PLAYERS_MAP = new HashMap<>(COLLECTION_DEFAULT_CAPACITY);
     private static final PlayerRepositoryImpl INSTANCE = new PlayerRepositoryImpl();
     private static final AtomicInteger idCounter = new AtomicInteger(0);
 
@@ -36,7 +35,7 @@ public class PlayerRepositoryImpl implements PlayerRepository<Long, Player> {
      */
     @Override
     public Optional<Player> findById(Long id) {
-        return Optional.ofNullable(playersMap.getOrDefault(id, null));
+        return Optional.ofNullable(PLAYERS_MAP.getOrDefault(id, null));
     }
 
     /**
@@ -44,7 +43,7 @@ public class PlayerRepositoryImpl implements PlayerRepository<Long, Player> {
      */
     @Override
     public Optional<Player> findByUsername(String username) {
-        return playersMap.values().stream()
+        return PLAYERS_MAP.values().stream()
                 .filter(p -> p.getUsername().equals(username))
                 .findFirst();
     }
@@ -54,7 +53,7 @@ public class PlayerRepositoryImpl implements PlayerRepository<Long, Player> {
      */
     @Override
     public List<Player> findAll() {
-        return new ArrayList<>(playersMap.values());
+        return new ArrayList<>(PLAYERS_MAP.values());
     }
 
     /**
@@ -68,7 +67,7 @@ public class PlayerRepositoryImpl implements PlayerRepository<Long, Player> {
             idCounter.incrementAndGet();
             player.setId(idCounter.longValue());
         }
-        playersMap.putIfAbsent(player.getId(), player);
+        PLAYERS_MAP.putIfAbsent(player.getId(), player);
         return findById(player.getId()).orElse(null);
     }
 
@@ -77,7 +76,7 @@ public class PlayerRepositoryImpl implements PlayerRepository<Long, Player> {
      */
     @Override
     public void update(Player player) {
-        playersMap.replace(player.getId(), player);
+        PLAYERS_MAP.replace(player.getId(), player);
     }
 
     /**
@@ -85,7 +84,7 @@ public class PlayerRepositoryImpl implements PlayerRepository<Long, Player> {
      */
     @Override
     public boolean delete(Player player) {
-        return playersMap.remove(player.getId(), player);
+        return PLAYERS_MAP.remove(player.getId(), player);
     }
 }
 

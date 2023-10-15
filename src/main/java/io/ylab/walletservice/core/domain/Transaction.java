@@ -1,6 +1,5 @@
 package io.ylab.walletservice.core.domain;
 
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

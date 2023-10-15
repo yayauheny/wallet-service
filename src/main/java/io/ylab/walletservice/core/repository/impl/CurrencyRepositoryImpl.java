@@ -5,12 +5,12 @@ import io.ylab.walletservice.core.repository.CurrencyRepository;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
-
 
 /**
  * The {@link CurrencyRepositoryImpl} class implements the {@code CurrencyRepository} interface
@@ -22,7 +22,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class CurrencyRepositoryImpl implements CurrencyRepository<Long, Currency> {
 
     private static final int COLLECTION_DEFAULT_CAPACITY = 10;
-    public static final Map<Long, Currency> currenciesMap = new HashMap<>(COLLECTION_DEFAULT_CAPACITY);
+    private static final Map<Long, Currency> CURRENCIES_MAP = new HashMap<>(COLLECTION_DEFAULT_CAPACITY);
     private static final CurrencyRepositoryImpl INSTANCE = new CurrencyRepositoryImpl();
     private static final AtomicInteger idCounter = new AtomicInteger(0);
 
@@ -35,7 +35,7 @@ public class CurrencyRepositoryImpl implements CurrencyRepository<Long, Currency
      */
     @Override
     public Optional<Currency> findById(Long id) {
-        return Optional.ofNullable(currenciesMap.getOrDefault(id, null));
+        return Optional.ofNullable(CURRENCIES_MAP.getOrDefault(id, null));
     }
 
     /**
@@ -43,7 +43,7 @@ public class CurrencyRepositoryImpl implements CurrencyRepository<Long, Currency
      */
     @Override
     public Optional<Currency> findByCode(String code) {
-        return currenciesMap.values().stream()
+        return CURRENCIES_MAP.values().stream()
                 .filter(c -> c.getCode().equals(code))
                 .findFirst();
     }
@@ -53,7 +53,7 @@ public class CurrencyRepositoryImpl implements CurrencyRepository<Long, Currency
      */
     @Override
     public List<Currency> findAll() {
-        return List.copyOf(currenciesMap.values());
+        return new ArrayList<>(CURRENCIES_MAP.values());
     }
 
     /**
@@ -65,7 +65,7 @@ public class CurrencyRepositoryImpl implements CurrencyRepository<Long, Currency
             idCounter.incrementAndGet();
             currency.setId(idCounter.longValue());
         }
-        return currenciesMap.putIfAbsent(currency.getId(), currency);
+        return CURRENCIES_MAP.putIfAbsent(currency.getId(), currency);
     }
 
     /**
@@ -73,7 +73,7 @@ public class CurrencyRepositoryImpl implements CurrencyRepository<Long, Currency
      */
     @Override
     public void update(Currency currency) {
-        currenciesMap.replace(currency.getId(), currency);
+        CURRENCIES_MAP.replace(currency.getId(), currency);
     }
 
     /**
@@ -81,7 +81,7 @@ public class CurrencyRepositoryImpl implements CurrencyRepository<Long, Currency
      */
     @Override
     public boolean delete(Currency currency) {
-        return currenciesMap.remove(currency.getId(), currency);
+        return CURRENCIES_MAP.remove(currency.getId(), currency);
     }
 }
 

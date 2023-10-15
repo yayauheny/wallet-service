@@ -6,7 +6,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayDeque;
 import java.util.Queue;
 
-
 /**
  * The {@code Auditor} class for logging actions.
  */

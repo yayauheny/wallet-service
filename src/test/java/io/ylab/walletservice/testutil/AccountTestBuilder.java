@@ -10,7 +10,6 @@ import java.math.BigDecimal;
 
 import static io.ylab.walletservice.testutil.TestObjectsUtil.TEST_CURRENCY;
 
-
 @AllArgsConstructor
 @NoArgsConstructor(staticName = "anAccount")
 @With

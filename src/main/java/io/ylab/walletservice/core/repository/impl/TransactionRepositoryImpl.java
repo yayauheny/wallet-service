@@ -14,7 +14,6 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
-
 /**
  * The {@link TransactionRepositoryImpl} class implements the {@code TransactionRepository} interface
  * for accessing and manipulating transaction entities in a repository using an in-memory map.
@@ -25,7 +24,7 @@ import java.util.stream.Collectors;
 public class TransactionRepositoryImpl implements TransactionRepository<Long> {
 
     private static final int COLLECTION_DEFAULT_CAPACITY = 10;
-    private static final Map<Long, Transaction> transactionsMap = new HashMap<>(COLLECTION_DEFAULT_CAPACITY);
+    private static final Map<Long, Transaction> TRANSACTIONS_MAP = new HashMap<>(COLLECTION_DEFAULT_CAPACITY);
     private static final TransactionRepositoryImpl INSTANCE = new TransactionRepositoryImpl();
     private static final AtomicInteger idCounter = new AtomicInteger(0);
 
@@ -38,7 +37,7 @@ public class TransactionRepositoryImpl implements TransactionRepository<Long> {
      */
     @Override
     public Optional<Transaction> findById(Long id) {
-        return Optional.ofNullable(transactionsMap.getOrDefault(id, null));
+        return Optional.ofNullable(TRANSACTIONS_MAP.getOrDefault(id, null));
     }
 
     /**
@@ -46,7 +45,7 @@ public class TransactionRepositoryImpl implements TransactionRepository<Long> {
      */
     @Override
     public List<Transaction> findByPeriod(LocalDateTime from, LocalDateTime to, Long playerId) {
-        return transactionsMap.values().stream()
+        return TRANSACTIONS_MAP.values().stream()
                 .filter(t -> t.getParticipantAccount().getId().equals(playerId))
                 .filter(t -> t.getCreatedAt().isAfter(from) && t.getCreatedAt().isBefore(to))
                 .collect(Collectors.toCollection(ArrayList::new));
@@ -57,7 +56,7 @@ public class TransactionRepositoryImpl implements TransactionRepository<Long> {
      */
     @Override
     public List<Transaction> findAllByAccountId(Long accountId) {
-        return transactionsMap.values().stream()
+        return TRANSACTIONS_MAP.values().stream()
                 .filter(t -> t.getParticipantAccount().getId().equals(accountId))
                 .collect(Collectors.toCollection(ArrayList::new));
     }
@@ -67,7 +66,7 @@ public class TransactionRepositoryImpl implements TransactionRepository<Long> {
      */
     @Override
     public List<Transaction> findAll() {
-        return new ArrayList<>(transactionsMap.values());
+        return new ArrayList<>(TRANSACTIONS_MAP.values());
     }
 
     /**
@@ -79,7 +78,7 @@ public class TransactionRepositoryImpl implements TransactionRepository<Long> {
             idCounter.incrementAndGet();
             transaction.setId(idCounter.longValue());
         }
-        return transactionsMap.putIfAbsent(transaction.getId(), transaction);
+        return TRANSACTIONS_MAP.putIfAbsent(transaction.getId(), transaction);
     }
 
     /**
@@ -87,7 +86,7 @@ public class TransactionRepositoryImpl implements TransactionRepository<Long> {
      */
     @Override
     public boolean delete(Transaction transaction) {
-        return transactionsMap.remove(transaction.getId(), transaction);
+        return TRANSACTIONS_MAP.remove(transaction.getId(), transaction);
     }
 }
 

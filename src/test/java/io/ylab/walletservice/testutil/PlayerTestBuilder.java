@@ -7,7 +7,6 @@ import lombok.With;
 
 import java.time.LocalDate;
 
-
 @AllArgsConstructor
 @NoArgsConstructor(staticName = "aPlayer")
 @With

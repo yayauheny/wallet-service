@@ -9,7 +9,6 @@ import io.ylab.walletservice.core.domain.TransactionType;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-
 public class TestObjectsUtil {
 
     public static final Account TEST_ACCOUNT = AccountTestBuilder.anAccount()

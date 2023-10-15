@@ -12,7 +12,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 
-
 /**
  * The {@link AccountRepositoryImpl} class implements the {@code AccountRepository} interface
  * for accessing and manipulating account entities in a repository using an in-memory map.
@@ -23,9 +22,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class AccountRepositoryImpl implements AccountRepository<Long, Account> {
 
     private static final int COLLECTION_DEFAULT_CAPACITY = 10;
-    public static final Map<Long, Account> accountsMap = new HashMap<>(COLLECTION_DEFAULT_CAPACITY);
+    private static final Map<Long, Account> ACCOUNTS_MAP = new HashMap<>(COLLECTION_DEFAULT_CAPACITY);
     private static final AccountRepositoryImpl INSTANCE = new AccountRepositoryImpl();
-    private static final AtomicInteger idCounter = new AtomicInteger(0);
+    private static AtomicInteger idCounter = new AtomicInteger(0);
 
     public static AccountRepositoryImpl getInstance() {
         return INSTANCE;
@@ -36,7 +35,7 @@ public class AccountRepositoryImpl implements AccountRepository<Long, Account> {
      */
     @Override
     public Optional<Account> findById(Long id) {
-        return Optional.ofNullable(accountsMap.getOrDefault(id, null));
+        return Optional.ofNullable(ACCOUNTS_MAP.getOrDefault(id, null));
     }
 
     /**
@@ -44,7 +43,7 @@ public class AccountRepositoryImpl implements AccountRepository<Long, Account> {
      */
     @Override
     public Optional<Account> findByPlayerId(Long playerId) {
-        return accountsMap.values().stream()
+        return ACCOUNTS_MAP.values().stream()
                 .filter(a -> a.getPlayerId().equals(playerId))
                 .findFirst();
     }
@@ -54,7 +53,7 @@ public class AccountRepositoryImpl implements AccountRepository<Long, Account> {
      */
     @Override
     public List<Account> findAll() {
-        return new ArrayList<>(accountsMap.values());
+        return new ArrayList<>(ACCOUNTS_MAP.values());
     }
 
     /**
@@ -66,7 +65,7 @@ public class AccountRepositoryImpl implements AccountRepository<Long, Account> {
             idCounter.incrementAndGet();
             account.setId(idCounter.longValue());
         }
-        accountsMap.put(account.getId(), account);
+        ACCOUNTS_MAP.put(account.getId(), account);
         return findById(account.getId()).orElse(null);
     }
 
@@ -75,7 +74,7 @@ public class AccountRepositoryImpl implements AccountRepository<Long, Account> {
      */
     @Override
     public void update(Account account) {
-        accountsMap.replace(account.getId(), account);
+        ACCOUNTS_MAP.replace(account.getId(), account);
     }
 
     /**
@@ -83,7 +82,7 @@ public class AccountRepositoryImpl implements AccountRepository<Long, Account> {
      */
     @Override
     public boolean delete(Account account) {
-        return accountsMap.remove(account.getId(), account);
+        return ACCOUNTS_MAP.remove(account.getId(), account);
     }
 }
 
