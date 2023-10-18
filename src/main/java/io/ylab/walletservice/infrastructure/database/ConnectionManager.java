@@ -68,7 +68,7 @@ public class ConnectionManager {
     }
 
     /**
-     * Reloads the database configuration, initializing the connection pool and other related settings.
+     * Reloads the database configuration, initializing the connection pool and other related settings based on environment property.
      */
     public static void reloadConfiguration() {
         String environment = System.getProperty("app.environment", "dev");

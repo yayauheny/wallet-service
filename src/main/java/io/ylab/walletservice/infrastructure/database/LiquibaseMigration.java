@@ -13,13 +13,27 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
+/**
+ * Utility class for managing Liquibase migrations in the application.
+ *
+ * This class provides a method to update the database schema using Liquibase based on a specified changelog file.
+ * Additionally, it allows the creation of a schema before executing the Liquibase update operation.
+ *
+ */
 @UtilityClass
 public class LiquibaseMigration {
 
+    /**
+     * Updates the database schema using Liquibase based on the specified changelog file.
+     * Optionally creates the Liquibase schema before executing the update.
+     *
+     * @throws RuntimeException if an error occurs during the update operation.
+     */
     public void update() {
         try {
             String changelogFile = PropertiesUtil.get("db.migrations.changelog-file");
             String liquibaseSchemaName = PropertiesUtil.get("db.migrations.liquibaseSchemaName");
+
             createSchema(liquibaseSchemaName);
 
             Connection connection = ConnectionManager.getConnection();
@@ -29,10 +43,16 @@ public class LiquibaseMigration {
 
             liquibase.update();
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 
+    /**
+     * Creates a database schema if it does not exist.
+     *
+     * @param schemaName The name of the schema to be created.
+     * @throws RuntimeException if an error occurs during the schema creation.
+     */
     private void createSchema(String schemaName) {
         String query = "CREATE SCHEMA IF NOT EXISTS %s;".formatted(schemaName);
         try (Connection connection = ConnectionManager.getConnection();
