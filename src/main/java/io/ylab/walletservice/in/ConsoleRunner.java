@@ -183,6 +183,7 @@ public class ConsoleRunner {
                 Auditor.log("player: %s is logged in".formatted(player.getUsername()));
             } else {
                 System.err.println(INCORRECT_INPUT);
+                authenticate();
             }
         } else {
             System.err.println("Такого пользователя не существует, зарегистрируйтесь или проверьте логин");

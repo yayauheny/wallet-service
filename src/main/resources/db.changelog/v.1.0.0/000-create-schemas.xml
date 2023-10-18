@@ -7,8 +7,7 @@
 
     <changeSet id="000-create-schemas" author="yayauheny">
         <sql>
-            CREATE SCHEMA wallet_service;
-            CREATE SCHEMA service_tables;
+            CREATE SCHEMA IF NOT EXISTS wallet_service;
         </sql>
     </changeSet>
 

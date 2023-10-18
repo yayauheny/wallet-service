@@ -25,19 +25,23 @@
             <column name="player_role" value="ADMIN"/>
             <column name="username" value="admin"/>
             <column name="birth_date" value="1990-01-15"/>
-            <column name="password" value="admin"/>
+            <!--        hashed "admin" password-->
+            <column name="password" value="$2a$06$n5xIPDXJzygGpIZHFfhzc.XcUVPsWJlwlDGYvqJkbNVy4b7NVKeJS"/>
         </insert>
+
         <insert schemaName="wallet_service" tableName="players">
             <column name="player_role" value="USER"/>
             <column name="username" value="user1"/>
             <column name="birth_date" value="1985-05-20"/>
-            <column name="password" value="user1"/>
+            <!--        hashed "user1" password-->
+            <column name="password" value="$2a$06$m8QCnpnV2nCHQAtZqHe32uwLm6gwx6IeyTX5CgO4DeQ6sfqIQHmZm"/>
         </insert>
         <insert schemaName="wallet_service" tableName="players">
             <column name="player_role" value="USER"/>
             <column name="username" value="user2"/>
             <column name="birth_date" value="1988-09-10"/>
-            <column name="password" value="user2"/>
+            <!--        hashed "user2" password-->
+            <column name="password" value="$2a$06$dHSLhtRZuDG/1V0ImZ5ZO.oEoCGYy3ZfEy0aCHL1GGuZSx83m1cZG"/>
         </insert>
     </changeSet>
 
