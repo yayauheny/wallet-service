@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<databaseChangeLog
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+    https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+    <changeSet id="insert-currencies" author="yayauheny">
+        <insert schemaName="wallet_service" tableName="currencies">
+            <column name="rate" valueNumeric="1.23"/>
+            <column name="code" value="USD"/>
+        </insert>
+        <insert schemaName="wallet_service" tableName="currencies">
+            <column name="rate" valueNumeric="1.27"/>
+            <column name="code" value="EUR"/>
+        </insert>
+        <insert schemaName="wallet_service" tableName="currencies">
+            <column name="rate" valueNumeric="110.50"/>
+            <column name="code" value="JPY"/>
+        </insert>
+    </changeSet>
+
+    <changeSet id="insert-players" author="yayauheny">
+        <insert schemaName="wallet_service" tableName="players">
+            <column name="player_role" value="ADMIN"/>
+            <column name="username" value="admin"/>
+            <column name="birth_date" value="1990-01-15"/>
+            <column name="password" value="admin"/>
+        </insert>
+        <insert schemaName="wallet_service" tableName="players">
+            <column name="player_role" value="USER"/>
+            <column name="username" value="user1"/>
+            <column name="birth_date" value="1985-05-20"/>
+            <column name="password" value="user1"/>
+        </insert>
+        <insert schemaName="wallet_service" tableName="players">
+            <column name="player_role" value="USER"/>
+            <column name="username" value="user2"/>
+            <column name="birth_date" value="1988-09-10"/>
+            <column name="password" value="user2"/>
+        </insert>
+    </changeSet>
+
+    <changeSet id="insert-accounts" author="yayauheny">
+        <insert schemaName="wallet_service" tableName="accounts">
+            <column name="current_balance" valueNumeric="1000.50"/>
+            <column name="created_at" value="2023-01-01"/>
+            <column name="currency_code" value="USD"/>
+            <column name="player_id" valueNumeric="1"/>
+        </insert>
+        <insert schemaName="wallet_service" tableName="accounts">
+            <column name="current_balance" valueNumeric="500.75"/>
+            <column name="created_at" value="2023-02-15"/>
+            <column name="currency_code" value="EUR"/>
+            <column name="player_id" valueNumeric="2"/>
+        </insert>
+        <insert schemaName="wallet_service" tableName="accounts">
+            <column name="current_balance" valueNumeric="200.30"/>
+            <column name="created_at" value="2023-03-20"/>
+            <column name="currency_code" value="JPY"/>
+            <column name="player_id" valueNumeric="3"/>
+        </insert>
+    </changeSet>
+
+    <changeSet id="insert transactions" author="yayauheny">
+        <insert schemaName="wallet_service" tableName="transactions">
+            <column name="type" value="DEBIT"/>
+            <column name="amount" valueNumeric="50.25"/>
+            <column name="created_at" value="2023-01-02"/>
+            <column name="currency_code" value="USD"/>
+            <column name="participant_account_id" valueNumeric="1"/>
+        </insert>
+        <insert schemaName="wallet_service" tableName="transactions">
+            <column name="type" value="CREDIT"/>
+            <column name="amount" valueNumeric="20.50"/>
+            <column name="created_at" value="2023-02-20"/>
+            <column name="currency_code" value="EUR"/>
+            <column name="participant_account_id" valueNumeric="2"/>
+        </insert>
+        <insert schemaName="wallet_service" tableName="transactions">
+            <column name="type" value="CREDIT"/>
+            <column name="amount" valueNumeric="10.75"/>
+            <column name="created_at" value="2023-03-25"/>
+            <column name="currency_code" value="JPY"/>
+            <column name="participant_account_id" valueNumeric="3"/>
+        </insert>
+    </changeSet>
+
+</databaseChangeLog>

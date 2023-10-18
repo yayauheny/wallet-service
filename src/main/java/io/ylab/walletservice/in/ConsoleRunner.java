@@ -9,6 +9,7 @@ import io.ylab.walletservice.core.service.command.CreateCommand;
 import io.ylab.walletservice.core.service.impl.PlayerServiceImpl;
 import io.ylab.walletservice.exception.DatabaseException;
 import io.ylab.walletservice.infrastructure.database.ConnectionManager;
+import io.ylab.walletservice.infrastructure.database.LiquibaseMigration;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -31,6 +32,7 @@ public class ConsoleRunner {
     static {
         System.setProperty("app.environment", "dev");
         ConnectionManager.reloadConfiguration();
+        LiquibaseMigration.update();
     }
 
     /**
