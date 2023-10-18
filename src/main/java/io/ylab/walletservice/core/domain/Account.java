@@ -6,6 +6,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -15,6 +16,7 @@ import java.util.List;
 @EqualsAndHashCode(exclude = "transactions")
 @Getter
 @Setter
+@ToString(exclude = "transactions")
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
@@ -25,8 +27,9 @@ public class Account {
     private BigDecimal currentBalance = BigDecimal.ZERO;
     @Builder.Default
     private List<Transaction> transactions = new ArrayList<>();
-    private Currency currency;
+    private String currencyCode;
     private Long playerId;
+    private Currency currency;
     @Builder.Default
     private LocalDateTime createdAt = LocalDateTime.now();
 }

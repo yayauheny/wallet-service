@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.10.xsd">
+
+    <changeSet id="1-createCurrenciesTable" author="yayauheny">
+        <sql>
+            CREATE TABLE IF NOT EXISTS currencies
+            (
+                id   BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+                rate NUMERIC(16, 2)    NOT NULL,
+                code VARCHAR(3) UNIQUE NOT NULL
+            );
+        </sql>
+    </changeSet>
+
+    <changeSet id="2-createPlayersTable" author="yayauheny">
+        <sql>
+            CREATE TABLE IF NOT EXISTS players
+            (
+                id          BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+                player_role VARCHAR(32)         NOT NULL,
+                username    VARCHAR(128) UNIQUE NOT NULL,
+                birth_date  DATE                NOT NULL,
+                password    bytea               NOT NULL
+            );
+        </sql>
+    </changeSet>
+
+    <changeSet id="3-createAccountsTable" author="yayauheny">
+        <sql>
+            CREATE TABLE IF NOT EXISTS accounts
+            (
+                id              BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+                current_balance NUMERIC(16, 2) NOT NULL,
+                created_at      TIMESTAMP      NOT NULL,
+                currency_code   VARCHAR(3)     NOT NULL
+                REFERENCES currencies (code)
+                ON UPDATE CASCADE
+                ON DELETE SET NULL,
+                player_id       BIGINT         NOT NULL
+                REFERENCES players (id)
+                ON UPDATE CASCADE
+                ON DELETE CASCADE
+            );
+        </sql>
+    </changeSet>
+
+    <changeSet id="4-createTransactionsTable" author="yayauheny">
+        <sql>
+            CREATE TABLE IF NOT EXISTS transactions
+            (
+                id                     BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+                type                   VARCHAR(32)    NOT NULL,
+                amount                 NUMERIC(16, 2) NOT NULL,
+                created_at             TIMESTAMP      NOT NULL,
+                currency_code          VARCHAR(3)     NOT NULL
+                REFERENCES currencies (code)
+                ON UPDATE CASCADE
+                ON DELETE SET NULL,
+                participant_account_id BIGINT         NOT NULL
+                REFERENCES accounts (id)
+                ON UPDATE CASCADE
+                ON DELETE CASCADE
+            );
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>

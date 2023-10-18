@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<databaseChangeLog
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+    <changeSet id="1-insertCurrenciesData" author="yayauheny">
+        <sql>
+            INSERT INTO currencies (rate, code)
+            VALUES (1.23, 'USD'),
+                   (1.27, 'EUR'),
+                   (110.5, 'JPY');
+        </sql>
+    </changeSet>
+
+    <changeSet id="2-insertPlayersData" author="yayauheny">
+        <sql>
+            INSERT INTO players (player_role, username, birth_date, password)
+            VALUES ('ADMIN', 'admin', '1990-01-15', E'\\xadmin'),
+                   ('USER', 'user1', '1985-05-20', E'\\xuser1'),
+                   ('USER', 'user2', '1988-09-10', E'\\xuser2');
+        </sql>
+    </changeSet>
+
+    <changeSet id="3-insertAccountsData" author="yayauheny">
+        <sql>
+            INSERT INTO accounts (current_balance, created_at, currency_code, player_id)
+            VALUES (1000.50, '2023-01-01', 'USD', 1),
+                   (500.75, '2023-02-15', 'EUR', 2),
+                   (200.30, '2023-03-20', 'JPY', 3);
+        </sql>
+    </changeSet>
+
+    <changeSet id="4-insertTransactionsData" author="yayauheny">
+        <sql>
+            INSERT INTO transactions (type, amount, created_at, currency_code, participant_account_id)
+            VALUES ('DEBIT', 50.25, '2023-01-02', 'USD', 1),
+                   ('CREDIT', 20.50, '2023-02-20', 'EUR', 2),
+                   ('CREDIT', 10.75, '2023-03-25', 'JPY', 3);
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>
+
+
+
+

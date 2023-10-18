@@ -7,6 +7,8 @@ import io.ylab.walletservice.core.domain.Player;
 import io.ylab.walletservice.core.service.command.Command;
 import io.ylab.walletservice.core.service.command.CreateCommand;
 import io.ylab.walletservice.core.service.impl.PlayerServiceImpl;
+import io.ylab.walletservice.exception.DatabaseException;
+import io.ylab.walletservice.infrastructure.database.ConnectionManager;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -25,6 +27,11 @@ public class ConsoleRunner {
     private static final String INCORRECT_INPUT = "Некорректный ввод, попробуйте снова";
     private static PlayerServiceImpl playerService = new PlayerServiceImpl();
     private static Player currentPlayer;
+
+    static {
+        System.setProperty("app.environment", "dev");
+        ConnectionManager.reloadConfiguration();
+    }
 
     /**
      * The main method to start the console-based user interface.
@@ -66,13 +73,18 @@ public class ConsoleRunner {
                     register();
                     authorize(currentPlayer);
                 }
-                case 3 -> System.out.println("Выход из приложения");
+                case 3 -> {
+                    System.out.println("Выход из приложения");
+                    ConnectionManager.closeConnectionPool();
+                }
                 default -> throw new InputMismatchException();
             }
-        } catch (InputMismatchException | NumberFormatException |
-                 IOException e) {
+        } catch (InputMismatchException | NumberFormatException | IOException e) {
             System.err.println(INCORRECT_INPUT);
             authenticate();
+        } catch (DatabaseException e) {
+            System.err.println(e.getMessage());
+            e.printStackTrace();
         }
     }
 
@@ -81,7 +93,7 @@ public class ConsoleRunner {
      *
      * @param player The authenticated player.
      */
-    private static void authorize(Player player) {
+    private static void authorize(Player player) throws DatabaseException {
         if (currentPlayer == null) {
             authenticate();
         }
@@ -103,6 +115,7 @@ public class ConsoleRunner {
                 System.out.println("Завершение работы...");
             } else if (choice == exitFromAccountNumber) {
                 currentPlayer = null;
+                ConnectionManager.closeConnectionPool();
                 authenticate();
             } else if (choice > 0 && choice <= commands.size()) {
                 commands.get(choice - 1).execute(player);
@@ -124,7 +137,7 @@ public class ConsoleRunner {
      *
      * @return The logged-in player.
      */
-    private static boolean login() {
+    private static boolean login() throws DatabaseException {
         try {
             System.out.println("Введите логин:");
             String loginInput = READER.readLine();
@@ -142,8 +155,9 @@ public class ConsoleRunner {
      *
      * @return The newly registered player.
      */
-    private static void register() {
-        registerNewPlayer();
+    private static void register() throws DatabaseException {
+        Command command = new CreateCommand();
+        command.execute(null);
     }
 
     /**
@@ -153,7 +167,7 @@ public class ConsoleRunner {
      * @param inputPassword The entered password.
      * @return The authenticated player.
      */
-    private static boolean processLoginCredentials(String username, String inputPassword) {
+    private static boolean processLoginCredentials(String username, String inputPassword) throws DatabaseException {
         Optional<Player> maybePlayer = playerService.findByUsername(username);
         boolean isVerified = false;
 
@@ -173,16 +187,6 @@ public class ConsoleRunner {
             authenticate();
         }
         return isVerified;
-    }
-
-    /**
-     * Registers a new player by providing user details.
-     *
-     * @return The newly registered player.
-     */
-    private static void registerNewPlayer() {
-        Command command = new CreateCommand();
-        command.execute(null);
     }
 }
 

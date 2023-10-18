@@ -2,7 +2,6 @@ package io.ylab.walletservice.exception;
 
 /**
  * Thrown to indicate that exception with database occured.
- *
  */
 public class DatabaseException extends Exception {
 
@@ -11,6 +10,7 @@ public class DatabaseException extends Exception {
      * detail message.
      */
     public DatabaseException() {
+        super("Exception during database work, try again");
     }
 
     /**

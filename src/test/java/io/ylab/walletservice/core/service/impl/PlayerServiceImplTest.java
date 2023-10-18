@@ -2,27 +2,29 @@ package io.ylab.walletservice.core.service.impl;
 
 import io.ylab.walletservice.core.domain.Account;
 import io.ylab.walletservice.core.domain.Player;
+import io.ylab.walletservice.core.domain.PlayerRole;
 import io.ylab.walletservice.core.domain.Transaction;
 import io.ylab.walletservice.core.domain.TransactionType;
-import io.ylab.walletservice.core.repository.impl.PlayerRepositoryImpl;
+import io.ylab.walletservice.exception.DatabaseException;
 import io.ylab.walletservice.exception.InvalidIdException;
-import io.ylab.walletservice.exception.NotFoundException;
 import io.ylab.walletservice.testutil.AccountTestBuilder;
 import io.ylab.walletservice.testutil.PlayerTestBuilder;
+import io.ylab.walletservice.testutil.PostgresTestcontainer;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import static io.ylab.walletservice.testutil.TestObjectsUtil.TEST_ACCOUNT;
-import static io.ylab.walletservice.testutil.TestObjectsUtil.TEST_CURRENCY;
-import static io.ylab.walletservice.testutil.TestObjectsUtil.TEST_PLAYER;
+import static io.ylab.walletservice.testutil.TestObjectsUtil.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -31,36 +33,35 @@ import static org.mockito.Mockito.doReturn;
 @ExtendWith(MockitoExtension.class)
 class PlayerServiceImplTest {
 
-    @InjectMocks
-    PlayerServiceImpl playerService;
-    @Mock
-    PlayerRepositoryImpl playerRepository;
-    @Mock
-    AccountServiceImpl accountService;
+    static CurrencyServiceImpl currencyService = new CurrencyServiceImpl();
+    static PlayerServiceImpl playerService = new PlayerServiceImpl();
+    static AccountServiceImpl accountService = new AccountServiceImpl();
+    static TransactionServiceImpl transactionService = new TransactionServiceImpl();
+
+    @BeforeAll
+    static void loadDatabase() {
+        PostgresTestcontainer.init();
+        createObjects(currencyService, playerService, accountService);
+    }
+
+    @AfterAll
+    static void close() {
+        PostgresTestcontainer.close();
+    }
 
     @Test
     @DisplayName("should find existing player by id")
-    void shouldFindPlayerById() {
-        Long playerId = TEST_PLAYER.getId();
-        Optional<Player> expectedPlayer = Optional.of(TEST_PLAYER);
-
-        doReturn(expectedPlayer)
-                .when(playerRepository).findById(playerId);
-
-        Optional<Player> actualResult = playerService.findById(playerId);
+    void shouldFindPlayerById() throws DatabaseException {
+        Optional<Player> expectedPlayer = Optional.of(TEST_PLAYER_IVAN);
+        Optional<Player> actualResult = playerService.findById(TEST_PLAYER_IVAN.getId());
 
         assertThat(actualResult).isPresent().isEqualTo(expectedPlayer);
     }
 
     @Test
     @DisplayName("should return an empty optional when player not found")
-    void shouldReturnEmptyOptionalWhenPlayerNotFound() {
-        Optional<Player> expectedPlayer = Optional.empty();
-
-        doReturn(expectedPlayer)
-                .when(playerRepository).findById(any());
-
-        Optional<Player> actualResult = playerService.findById(0L);
+    void shouldReturnEmptyOptionalWhenPlayerNotFound() throws DatabaseException {
+        Optional<Player> actualResult = playerService.findById(9999L);
 
         assertThat(actualResult).isEmpty();
     }
@@ -77,118 +78,59 @@ class PlayerServiceImplTest {
 
     @Test
     @DisplayName("should return all players")
-    void shouldReturnAllPlayers() {
-        int expectedSize = 1;
-
-        doReturn(List.of(TEST_PLAYER))
-                .when(playerRepository).findAll();
-
+    void shouldReturnAllPlayers() throws DatabaseException {
+        int expectedSize = 3;
         List<Player> actualResult = playerService.findAll();
 
-        assertThat(actualResult).hasSize(expectedSize).containsExactlyInAnyOrder(TEST_PLAYER);
-    }
-
-    @Test
-    @DisplayName("should return an empty list if no players found")
-    void shouldReturnAnEmptyListIfNoPlayersFound() {
-        doReturn(List.of())
-                .when(playerRepository).findAll();
-
-        List<Player> actualResult = playerService.findAll();
-
-        assertThat(actualResult).isEmpty();
+        assertThat(actualResult).hasSize(expectedSize).containsExactlyInAnyOrder(TEST_PLAYER_IVAN, TEST_PLAYER_ANDREW, TEST_PLAYER_HANNA);
     }
 
     @Test
     @DisplayName("should save and return saved Player")
-    void shouldSaveAndReturnPlayer() {
-        doReturn(TEST_PLAYER)
-                .when(playerRepository).save(TEST_PLAYER);
+    void shouldSaveAndReturnPlayer() throws DatabaseException {
+        Player player = PlayerTestBuilder.aPlayer()
+                .withRole(PlayerRole.ADMIN)
+                .withUsername("dummy1")
+                .withPassword("dummy1")
+                .withBirthDate(LocalDate.now())
+                .build();
+        Player actualResult = playerService.save(player);
 
-        Player actualResult = playerService.save(TEST_PLAYER);
-
-        assertThat(actualResult).isNotNull().isEqualTo(TEST_PLAYER);
+        assertThat(actualResult).isNotNull().isEqualTo(player);
     }
 
     @Test
     @DisplayName("should update existing player")
-    void shouldUpdateExistingPlayer() {
-        Player player = PlayerTestBuilder.aPlayer()
-                .withId(100L)
-                .withUsername("test-name")
-                .build();
-        Player updatedPlayer = PlayerTestBuilder.aPlayer()
-                .withId(player.getId())
-                .withUsername("changed-test-name")
-                .build();
+    void shouldUpdateExistingPlayer() throws DatabaseException {
+        TEST_PLAYER_IVAN.setUsername("updated-ivan");
+        playerService.update(TEST_PLAYER_IVAN);
 
-        doReturn(player)
-                .when(playerRepository).save(player);
+        Optional<Player> actualResult = playerService.findById(TEST_PLAYER_IVAN.getId());
 
-        playerService.save(player);
-        playerService.update(updatedPlayer);
-
-        doReturn(Optional.of(updatedPlayer))
-                .when(playerRepository).findById(updatedPlayer.getId());
-
-        Optional<Player> actualResult = playerService.findById(updatedPlayer.getId());
-
-        assertThat(actualResult).isPresent().isEqualTo(Optional.of(updatedPlayer));
+        assertThat(actualResult).isPresent().isEqualTo(Optional.of(TEST_PLAYER_IVAN));
     }
 
     @Test
     @DisplayName("should return all player transactions")
-    void shouldReturnAllPlayerTransactions() throws NotFoundException {
-        List<Transaction> transactions = List.of(
-                Transaction.builder()
-                        .id(1L)
-                        .amount(new BigDecimal("300"))
-                        .currency(TEST_CURRENCY)
-                        .participantAccount(TEST_ACCOUNT)
-                        .type(TransactionType.CREDIT)
-                        .build(),
-                Transaction.builder()
-                        .id(1L)
-                        .amount(new BigDecimal("100"))
-                        .currency(TEST_CURRENCY)
-                        .participantAccount(TEST_ACCOUNT)
-                        .type(TransactionType.DEBIT)
-                        .build()
-        );
-        Account account = AccountTestBuilder.anAccount()
-                .withPlayerId(TEST_PLAYER.getId())
-                .withId(999L)
-                .withCurrentBalance(new BigDecimal("200"))
-                .withCurrency(TEST_CURRENCY)
-                .build();
-        account.setTransactions(transactions);
+    void shouldReturnAllPlayerTransactions() throws DatabaseException {
+        int size = 1;
+        TEST_TRANSACTION.setParticipantAccountId(TEST_ACCOUNT_IVAN.getId());
+        List<Transaction> transactions = new ArrayList<>(Arrays.asList(TEST_TRANSACTION));
 
-        doReturn(Optional.of(account))
-                .when(accountService).findByPlayerId(account.getPlayerId());
+        transactionService.save(TEST_TRANSACTION, TEST_ACCOUNT_IVAN);
 
-        List<Transaction> actualResult = playerService.getTransactions(account.getPlayerId());
+        List<Transaction> actualResult = playerService.getTransactions(TEST_ACCOUNT_IVAN.getPlayerId());
 
-        assertThat(actualResult).isNotNull().isEqualTo(transactions);
+        assertThat(actualResult).hasSize(1);
+        assertThat(actualResult).isNotEmpty().isEqualTo(transactions);
     }
 
     @Test
     @DisplayName("should delete player")
-    void shouldDeletePlayer() {
-        Player player = PlayerTestBuilder.aPlayer()
-                .withId(100L)
-                .withUsername("test-name")
-                .build();
+    void shouldDeletePlayer() throws DatabaseException {
+        playerService.delete(TEST_PLAYER_HANNA);
+        Optional<Player> actualResult = playerService.findById(TEST_PLAYER_HANNA.getId());
 
-        doReturn(player)
-                .when(playerRepository).save(player);
-        doReturn(Optional.empty())
-                .when(playerRepository).findById(player.getId());
-
-        Player savedPlayer = playerService.save(player);
-        playerService.delete(player);
-        Optional<Player> actualResult = playerService.findById(player.getId());
-
-        assertThat(savedPlayer).isNotNull().isEqualTo(player);
         assertThat(actualResult).isEmpty();
     }
 }

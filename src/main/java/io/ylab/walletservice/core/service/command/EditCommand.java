@@ -3,6 +3,7 @@ package io.ylab.walletservice.core.service.command;
 import io.ylab.walletservice.api.Auditor;
 import io.ylab.walletservice.core.domain.Player;
 import io.ylab.walletservice.core.domain.PlayerRole;
+import io.ylab.walletservice.exception.DatabaseException;
 import io.ylab.walletservice.util.DateTimeUtils;
 
 import java.io.IOException;
@@ -25,7 +26,7 @@ public class EditCommand implements Command {
      * @param player The player on which the command is executed.
      */
     @Override
-    public void execute(Player player) {
+    public void execute(Player player) throws DatabaseException {
         List<Player> players = printAllPlayers();
         readIdFromConsole(players);
     }
@@ -45,7 +46,7 @@ public class EditCommand implements Command {
      *
      * @param players The list of players to choose from.
      */
-    private void readIdFromConsole(List<Player> players) {
+    private void readIdFromConsole(List<Player> players) throws DatabaseException {
         System.out.println("Введите идентификатор пользователя для изменения:");
         try {
             long idFromConsole = Long.parseLong(READER.readLine());
@@ -67,7 +68,7 @@ public class EditCommand implements Command {
      *
      * @param player The player to be updated.
      */
-    private void updatePlayer(Player player) {
+    private void updatePlayer(Player player) throws DatabaseException {
         System.out.println("Изменить поля:\n1 - имя\n2 - дата рождения\n3 - роль");
         try {
             byte choice = Byte.parseByte(READER.readLine());

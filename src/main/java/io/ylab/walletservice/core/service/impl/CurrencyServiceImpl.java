@@ -4,6 +4,7 @@ import io.ylab.walletservice.api.Validator;
 import io.ylab.walletservice.core.domain.Currency;
 import io.ylab.walletservice.core.repository.impl.CurrencyRepositoryImpl;
 import io.ylab.walletservice.core.service.CurrencyService;
+import io.ylab.walletservice.exception.DatabaseException;
 import lombok.AllArgsConstructor;
 
 import java.util.List;
@@ -27,7 +28,7 @@ public class CurrencyServiceImpl implements CurrencyService<Long> {
      * {@inheritDoc}
      */
     @Override
-    public Optional<Currency> findById(Long id) {
+    public Optional<Currency> findById(Long id) throws DatabaseException {
         Validator.validateId(id);
         return currencyRepository.findById(id);
     }
@@ -36,7 +37,7 @@ public class CurrencyServiceImpl implements CurrencyService<Long> {
      * {@inheritDoc}
      */
     @Override
-    public Optional<Currency> findByCode(String code) {
+    public Optional<Currency> findByCode(String code) throws DatabaseException {
         return currencyRepository.findByCode(code);
     }
 
@@ -44,7 +45,7 @@ public class CurrencyServiceImpl implements CurrencyService<Long> {
      * {@inheritDoc}
      */
     @Override
-    public List<Currency> findAll() {
+    public List<Currency> findAll() throws DatabaseException {
         return currencyRepository.findAll();
     }
 
@@ -52,7 +53,7 @@ public class CurrencyServiceImpl implements CurrencyService<Long> {
      * {@inheritDoc}
      */
     @Override
-    public Currency save(Currency currency) {
+    public Currency save(Currency currency) throws DatabaseException {
         return currencyRepository.save(currency);
     }
 
@@ -60,7 +61,7 @@ public class CurrencyServiceImpl implements CurrencyService<Long> {
      * {@inheritDoc}
      */
     @Override
-    public void update(Currency currency) {
+    public void update(Currency currency) throws DatabaseException {
         currencyRepository.update(currency);
     }
 
@@ -68,7 +69,7 @@ public class CurrencyServiceImpl implements CurrencyService<Long> {
      * {@inheritDoc}
      */
     @Override
-    public boolean delete(Currency currency) {
+    public boolean delete(Currency currency) throws DatabaseException {
         return currencyRepository.delete(currency);
     }
 }

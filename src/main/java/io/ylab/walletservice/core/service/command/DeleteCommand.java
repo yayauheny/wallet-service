@@ -2,6 +2,7 @@ package io.ylab.walletservice.core.service.command;
 
 import io.ylab.walletservice.api.Auditor;
 import io.ylab.walletservice.core.domain.Player;
+import io.ylab.walletservice.exception.DatabaseException;
 
 import java.io.IOException;
 import java.util.InputMismatchException;
@@ -21,7 +22,7 @@ public class DeleteCommand implements Command {
      * @param player The player on which the command is executed.
      */
     @Override
-    public void execute(Player player) {
+    public void execute(Player player) throws DatabaseException {
         List<Player> players = printAllPlayers();
         deletePlayer(players);
     }
@@ -41,7 +42,7 @@ public class DeleteCommand implements Command {
      *
      * @param players The list of players to choose from.
      */
-    private void deletePlayer(List<Player> players) {
+    private void deletePlayer(List<Player> players) throws DatabaseException {
         System.out.println("Введите идентификатор пользователя для удаления:");
         try {
             long idFromConsole = Long.parseLong(READER.readLine());

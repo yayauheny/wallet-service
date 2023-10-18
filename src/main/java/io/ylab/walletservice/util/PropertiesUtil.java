@@ -23,6 +23,15 @@ public class PropertiesUtil {
         }
     }
 
+    public void replacePlaceholder(String placeholder, String value) {
+        if (value != null) {
+            for (String key : PROPERTIES.stringPropertyNames()) {
+                String replacedValue = PROPERTIES.getProperty(key).replace("${" + placeholder + "}", value);
+                PROPERTIES.setProperty(key, replacedValue);
+            }
+        }
+    }
+
     public String get(String key) {
         return PROPERTIES.getProperty(key);
     }

@@ -1,6 +1,7 @@
 package io.ylab.walletservice.core.service.receipt;
 
-import io.ylab.walletservice.core.domain.Receipt;
+import io.ylab.walletservice.core.dto.ReceiptDto;
+import io.ylab.walletservice.exception.DatabaseException;
 import io.ylab.walletservice.util.DateTimeUtils;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -30,11 +31,11 @@ public class SummaryReceiptService extends ReceiptService {
     /**
      * Builds the template for a summary receipt.
      *
-     * @param receipt The receipt to build the template for.
+     * @param receiptDto The receipt to build the template for.
      * @return The summary receipt template.
      */
     @Override
-    public String buildTemplate(Receipt receipt) {
+    public String buildTemplate(ReceiptDto receiptDto) throws DatabaseException {
         return """
                 %s
                 %s
@@ -46,13 +47,13 @@ public class SummaryReceiptService extends ReceiptService {
                 """.formatted(StringUtils.center("История транзакций", 70),
                 SEPARATOR,
                 StringUtils.rightPad("Игрок", 39),
-                receipt.player().getUsername(),
+                receiptDto.player().getUsername(),
                 StringUtils.rightPad("Период", 39),
-                (DateTimeUtils.parseDate(receipt.from()) + " - " + DateTimeUtils.parseDate(receipt.to())),
+                (DateTimeUtils.parseDate(receiptDto.from()) + " - " + DateTimeUtils.parseDate(receiptDto.to())),
                 StringUtils.rightPad("Дата и время формирования", 39),
                 (DateTimeUtils.parseCurrentDate() + ", " + DateTimeUtils.parseCurrentTime()),
                 SEPARATOR,
-                buildTransactionBody(receipt)
+                buildTransactionBody(receiptDto)
         );
     }
 }
