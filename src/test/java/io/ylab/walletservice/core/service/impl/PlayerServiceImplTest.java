@@ -1,13 +1,10 @@
 package io.ylab.walletservice.core.service.impl;
 
-import io.ylab.walletservice.core.domain.Account;
 import io.ylab.walletservice.core.domain.Player;
 import io.ylab.walletservice.core.domain.PlayerRole;
 import io.ylab.walletservice.core.domain.Transaction;
-import io.ylab.walletservice.core.domain.TransactionType;
 import io.ylab.walletservice.exception.DatabaseException;
 import io.ylab.walletservice.exception.InvalidIdException;
-import io.ylab.walletservice.testutil.AccountTestBuilder;
 import io.ylab.walletservice.testutil.PlayerTestBuilder;
 import io.ylab.walletservice.testutil.PostgresTestcontainer;
 import org.junit.jupiter.api.AfterAll;
@@ -17,7 +14,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -27,8 +23,6 @@ import java.util.Optional;
 import static io.ylab.walletservice.testutil.TestObjectsUtil.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doReturn;
 
 @ExtendWith(MockitoExtension.class)
 class PlayerServiceImplTest {

@@ -12,6 +12,11 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * The {@link AccountTestBuilder} class is a test utility for creating instances of the {@link Account} class
+ * with customizable or default attribute values. It implements the {@link TestBuilder} interface to provide
+ * a standardized way of constructing {@link Account} objects for testing scenarios.
+ */
 @AllArgsConstructor
 @NoArgsConstructor(staticName = "anAccount")
 @With
@@ -25,6 +30,9 @@ public class AccountTestBuilder implements TestBuilder<Account> {
     private List<Transaction> transactions = new ArrayList<>();
     private LocalDateTime createdAt;
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Account build() {
         return Account.builder()

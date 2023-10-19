@@ -1,6 +1,5 @@
 package io.ylab.walletservice.core.service.impl;
 
-import io.ylab.walletservice.core.domain.Account;
 import io.ylab.walletservice.core.domain.Transaction;
 import io.ylab.walletservice.core.domain.TransactionType;
 import io.ylab.walletservice.exception.DatabaseException;

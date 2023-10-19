@@ -9,16 +9,17 @@ import io.ylab.walletservice.core.domain.TransactionType;
 import io.ylab.walletservice.core.service.AccountService;
 import io.ylab.walletservice.core.service.CurrencyService;
 import io.ylab.walletservice.core.service.PlayerService;
-import io.ylab.walletservice.core.service.TransactionService;
-import io.ylab.walletservice.core.service.impl.TransactionServiceImpl;
 import io.ylab.walletservice.exception.DatabaseException;
 import lombok.experimental.UtilityClass;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Optional;
 
+/**
+ * The {@link TestObjectsUtil} class provides a set of predefined test objects for various domain entities,
+ * facilitating the setup of consistent and reusable test scenarios.
+ */
 @UtilityClass
 public class TestObjectsUtil {
 
@@ -83,7 +84,7 @@ public class TestObjectsUtil {
             .withParticipantAccountId(TEST_ACCOUNT_HANNA.getId())
             .build();
 
-    public void createObjects(CurrencyService currencyService, PlayerService playerService, AccountService accountService) {
+    public static void createObjects(CurrencyService currencyService, PlayerService playerService, AccountService accountService) {
         try {
             currencyService.save(TEST_CURRENCY_USD);
             currencyService.save(TEST_CURRENCY_EUR);

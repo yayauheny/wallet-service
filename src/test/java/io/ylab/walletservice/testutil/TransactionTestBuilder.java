@@ -11,6 +11,11 @@ import lombok.With;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+/**
+ * The {@link TransactionTestBuilder} class is a test utility for creating instances of the {@link Transaction} class
+ * with customizable or default attribute values. It implements the {@link TestBuilder} interface to provide
+ * a standardized way of constructing {@link Transaction} objects for testing scenarios.
+ */
 @AllArgsConstructor
 @NoArgsConstructor(staticName = "aTransaction")
 @With

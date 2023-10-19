@@ -9,6 +9,11 @@ import lombok.With;
 
 import java.time.LocalDate;
 
+/**
+ * The {@link PlayerTestBuilder} class is a test utility for creating instances of the {@link Player} class
+ * with customizable or default attribute values. It implements the {@link TestBuilder} interface to provide
+ * a standardized way of constructing {@link Player} objects for testing scenarios.
+ */
 @AllArgsConstructor
 @NoArgsConstructor(staticName = "aPlayer")
 @With

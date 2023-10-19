@@ -6,7 +6,6 @@ import io.ylab.walletservice.exception.InvalidFundsException;
 import io.ylab.walletservice.exception.InvalidIdException;
 import io.ylab.walletservice.testutil.AccountTestBuilder;
 import io.ylab.walletservice.testutil.PostgresTestcontainer;
-import io.ylab.walletservice.testutil.PostgresTestcontainer.*;
 import io.ylab.walletservice.testutil.TestObjectsUtil;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;

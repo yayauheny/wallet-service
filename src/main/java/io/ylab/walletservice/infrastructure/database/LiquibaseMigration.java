@@ -1,6 +1,5 @@
 package io.ylab.walletservice.infrastructure.database;
 
-import io.ylab.walletservice.exception.DatabaseException;
 import io.ylab.walletservice.util.PropertiesUtil;
 import liquibase.Liquibase;
 import liquibase.database.Database;

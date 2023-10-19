@@ -7,6 +7,11 @@ import lombok.With;
 
 import java.math.BigDecimal;
 
+/**
+ * The {@link CurrencyTestBuilder} class is a test utility for creating instances of the {@link Currency} class
+ * with customizable or default attribute values. It implements the {@link TestBuilder} interface to provide
+ * a standardized way of constructing {@link Currency} objects for testing scenarios.
+ */
 @AllArgsConstructor
 @NoArgsConstructor(staticName = "aCurrency")
 @With
