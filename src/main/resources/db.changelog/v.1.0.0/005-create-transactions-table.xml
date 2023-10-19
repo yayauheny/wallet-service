@@ -24,6 +24,10 @@
                 <constraints nullable="false"/>
             </column>
         </createTable>
+
+        <rollback>
+            <dropTable schemaName="wallet_service" tableName="transactions"/>
+        </rollback>
     </changeSet>
 
 </databaseChangeLog>

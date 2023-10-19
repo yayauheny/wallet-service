@@ -10,10 +10,13 @@ import io.ylab.walletservice.core.service.impl.PlayerServiceImpl;
 import io.ylab.walletservice.exception.DatabaseException;
 import io.ylab.walletservice.infrastructure.database.ConnectionManager;
 import io.ylab.walletservice.infrastructure.database.LiquibaseMigration;
+import io.ylab.walletservice.util.PropertiesUtil;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Optional;
@@ -32,7 +35,11 @@ public class ConsoleRunner {
     static {
         System.setProperty("app.environment", "dev");
         ConnectionManager.reloadConfiguration();
-        LiquibaseMigration.update();
+        try (Connection connection = ConnectionManager.getConnection()) {
+            LiquibaseMigration.update(PropertiesUtil.get("db.migrations.changelog-file"), connection);
+        } catch (DatabaseException | SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**

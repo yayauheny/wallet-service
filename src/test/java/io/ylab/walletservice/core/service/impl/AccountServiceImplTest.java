@@ -32,13 +32,13 @@ class AccountServiceImplTest {
     static AccountServiceImpl accountService = new AccountServiceImpl();
 
     @BeforeAll
-    static void loadDatabase() {
+    static void startContainer() {
         PostgresTestcontainer.init();
         TestObjectsUtil.createObjects(currencyService, playerService, accountService);
     }
 
     @AfterAll
-    static void close() {
+    static void closeContainer() {
         PostgresTestcontainer.close();
     }
 

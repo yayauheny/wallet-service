@@ -37,6 +37,13 @@
                 minValue="1"
                 maxValue="90000"
                 cycle="false"/>
+        <!-- Rollback change set -->
+        <rollback>
+            <dropTable schemaName="wallet_service" tableName="currencies_seq"/>
+            <dropTable schemaName="wallet_service" tableName="players_seq"/>
+            <dropTable schemaName="wallet_service" tableName="accounts_seq"/>
+            <dropTable schemaName="wallet_service" tableName="transactions_seq"/>
+        </rollback>
 
     </changeSet>
 

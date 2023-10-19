@@ -39,14 +39,12 @@ public class PropertiesUtil {
      * @param placeholder The placeholder to replace.
      * @param value       The value to substitute the placeholder.
      */
-    public void replacePlaceholder(String placeholder, String value) {
-        if (value != null) {
-            for (String key : PROPERTIES.stringPropertyNames()) {
-                String replacedValue = PROPERTIES.getProperty(key).replace("${" + placeholder + "}", value);
-                PROPERTIES.setProperty(key, replacedValue);
-            }
+    public void setPropertyValue(String key, String value) {
+        if (key != null && value != null) {
+            PROPERTIES.setProperty(key, value);
         }
     }
+
 
     /**
      * Retrieves the value associated with a specified key from the loaded properties.

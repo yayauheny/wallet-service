@@ -34,7 +34,7 @@ class TransactionServiceImplTest {
     static AccountServiceImpl accountService = new AccountServiceImpl();
 
     @BeforeAll
-    static void loadDatabase() {
+    static void startContainer() {
         PostgresTestcontainer.init();
         TestObjectsUtil.createObjects(currencyService, playerService, accountService);
         try {
@@ -45,7 +45,7 @@ class TransactionServiceImplTest {
     }
 
     @AfterAll
-    static void close() {
+    static void closeContainer() {
         PostgresTestcontainer.close();
     }
 

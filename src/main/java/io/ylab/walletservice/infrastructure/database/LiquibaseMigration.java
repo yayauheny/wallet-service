@@ -6,6 +6,7 @@ import liquibase.Liquibase;
 import liquibase.database.Database;
 import liquibase.database.DatabaseFactory;
 import liquibase.database.jvm.JdbcConnection;
+import liquibase.exception.LiquibaseException;
 import liquibase.resource.ClassLoaderResourceAccessor;
 import lombok.experimental.UtilityClass;
 
@@ -15,10 +16,9 @@ import java.sql.SQLException;
 
 /**
  * Utility class for managing Liquibase migrations in the application.
- *
+ * <p>
  * This class provides a method to update the database schema using Liquibase based on a specified changelog file.
  * Additionally, it allows the creation of a schema before executing the Liquibase update operation.
- *
  */
 @UtilityClass
 public class LiquibaseMigration {
@@ -29,19 +29,27 @@ public class LiquibaseMigration {
      *
      * @throws RuntimeException if an error occurs during the update operation.
      */
-    public void update() {
+    public void update(String changelogFile, Connection connection) {
         try {
-            String changelogFile = PropertiesUtil.get("db.migrations.changelog-file");
             String liquibaseSchemaName = PropertiesUtil.get("db.migrations.liquibaseSchemaName");
 
-            createSchema(liquibaseSchemaName);
+            createSchema(liquibaseSchemaName, connection);
 
-            Connection connection = ConnectionManager.getConnection();
             Database database = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(new JdbcConnection(connection));
             database.setLiquibaseSchemaName(liquibaseSchemaName);
             Liquibase liquibase = new Liquibase(changelogFile, new ClassLoaderResourceAccessor(), database);
-
             liquibase.update();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void rollback(int changesToRollback, String tagToRollBackTo, String changelogFile, Connection connection) throws LiquibaseException {
+        try {
+            Database database = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(new JdbcConnection(connection));
+            Liquibase liquibase = new Liquibase(changelogFile, new ClassLoaderResourceAccessor(), database);
+
+            liquibase.rollback(changesToRollback, tagToRollBackTo);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -53,12 +61,11 @@ public class LiquibaseMigration {
      * @param schemaName The name of the schema to be created.
      * @throws RuntimeException if an error occurs during the schema creation.
      */
-    private void createSchema(String schemaName) {
+    private void createSchema(String schemaName, Connection connection) {
         String query = "CREATE SCHEMA IF NOT EXISTS %s;".formatted(schemaName);
-        try (Connection connection = ConnectionManager.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+        try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
             preparedStatement.execute();
-        } catch (SQLException | DatabaseException e) {
+        } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }

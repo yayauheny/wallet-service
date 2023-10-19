@@ -39,13 +39,13 @@ class PlayerServiceImplTest {
     static TransactionServiceImpl transactionService = new TransactionServiceImpl();
 
     @BeforeAll
-    static void loadDatabase() {
+    static void startContainer() {
         PostgresTestcontainer.init();
         createObjects(currencyService, playerService, accountService);
     }
 
     @AfterAll
-    static void close() {
+    static void closeContainer() {
         PostgresTestcontainer.close();
     }
 
