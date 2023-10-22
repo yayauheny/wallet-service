@@ -1,43 +1,51 @@
 package io.ylab.walletservice.core.service.impl;
 
 import io.ylab.walletservice.core.domain.Account;
-import io.ylab.walletservice.core.repository.impl.AccountRepositoryImpl;
+import io.ylab.walletservice.exception.DatabaseException;
 import io.ylab.walletservice.exception.InvalidFundsException;
 import io.ylab.walletservice.exception.InvalidIdException;
 import io.ylab.walletservice.testutil.AccountTestBuilder;
+import io.ylab.walletservice.testutil.PostgresTestcontainer;
+import io.ylab.walletservice.testutil.TestObjectsUtil;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-import static io.ylab.walletservice.testutil.TestObjectsUtil.TEST_ACCOUNT;
+import static io.ylab.walletservice.testutil.TestObjectsUtil.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doReturn;
 
 @ExtendWith(MockitoExtension.class)
 class AccountServiceImplTest {
 
-    @InjectMocks
-    AccountServiceImpl accountService;
-    @Mock
-    AccountRepositoryImpl accountRepository;
+    static CurrencyServiceImpl currencyService = new CurrencyServiceImpl();
+    static PlayerServiceImpl playerService = new PlayerServiceImpl();
+    static AccountServiceImpl accountService = new AccountServiceImpl();
+
+    @BeforeAll
+    static void startContainer() {
+        PostgresTestcontainer.init();
+        TestObjectsUtil.createObjects(currencyService, playerService, accountService);
+    }
+
+    @AfterAll
+    static void closeContainer() {
+        PostgresTestcontainer.close();
+    }
 
     @Test
     @DisplayName("should find existing account by id")
-    void shouldFindAccountById() {
-        Long accountId = TEST_ACCOUNT.getId();
-        Optional<Account> expectedAccount = Optional.of(TEST_ACCOUNT);
-
-        doReturn(expectedAccount)
-                .when(accountRepository).findById(accountId);
+    void shouldFindAccountById() throws DatabaseException {
+        Long accountId = TEST_ACCOUNT_IVAN.getId();
+        Optional<Account> expectedAccount = Optional.of(TEST_ACCOUNT_IVAN);
 
         Optional<Account> actualResult = accountService.findById(accountId);
 
@@ -46,13 +54,8 @@ class AccountServiceImplTest {
 
     @Test
     @DisplayName("should return empty optional")
-    void shouldReturnEmptyOptionalWhenAccountNotFound() {
-        Optional<Account> expectedAccount = Optional.empty();
-
-        doReturn(expectedAccount)
-                .when(accountRepository).findById(any());
-
-        Optional<Account> actualResult = accountService.findById(0L);
+    void shouldReturnEmptyOptionalWhenAccountNotFound() throws DatabaseException {
+        Optional<Account> actualResult = accountService.findById(555L);
 
         assertThat(actualResult).isEmpty();
     }
@@ -69,13 +72,9 @@ class AccountServiceImplTest {
 
     @Test
     @DisplayName("should find account by player id")
-    void shouldFindAccountByPlayerId() {
-        Long playerId = TEST_ACCOUNT.getPlayerId();
-        Optional<Account> expectedAccount = Optional.of(TEST_ACCOUNT);
-
-        doReturn(expectedAccount)
-                .when(accountRepository)
-                .findByPlayerId(playerId);
+    void shouldFindAccountByPlayerId() throws DatabaseException {
+        Long playerId = TEST_ACCOUNT_HANNA.getPlayerId();
+        Optional<Account> expectedAccount = Optional.of(TEST_ACCOUNT_HANNA);
 
         Optional<Account> actualResult = accountService.findByPlayerId(playerId);
 
@@ -84,100 +83,63 @@ class AccountServiceImplTest {
 
     @Test
     @DisplayName("should return all accounts")
-    void shouldReturnAllAccounts() {
-        int expectedSize = 1;
-
-        doReturn(List.of(TEST_ACCOUNT))
-                .when(accountRepository).findAll();
+    void shouldReturnAllAccounts() throws DatabaseException {
+        int expectedSize = 3;
 
         List<Account> actualResult = accountService.findAll();
 
-        assertThat(actualResult).hasSize(expectedSize).containsExactlyInAnyOrder(TEST_ACCOUNT);
-    }
-
-    @Test
-    @DisplayName("should return an empty list if no accounts found")
-    void shouldReturnAnEmptyListIfNoAccountsFound() {
-        doReturn(List.of())
-                .when(accountRepository).findAll();
-
-        List<Account> actualResult = accountService.findAll();
-
-        assertThat(actualResult).isEmpty();
+        assertThat(actualResult).hasSize(expectedSize).containsExactlyInAnyOrder(TEST_ACCOUNT_IVAN, TEST_ACCOUNT_ANDREW, TEST_ACCOUNT_HANNA);
     }
 
     @Test
     @DisplayName("should save and return saved account")
-    void shouldSaveAndReturnAccount() {
-        doReturn(TEST_ACCOUNT)
-                .when(accountRepository).save(TEST_ACCOUNT);
+    void shouldSaveAndReturnAccount() throws DatabaseException {
+        Account account = AccountTestBuilder.anAccount()
+                .withCurrencyCode("USD")
+                .withCurrentBalance(BigDecimal.ZERO)
+                .withCreatedAt(LocalDateTime.now())
+                .withPlayerId(3L)
+                .build();
+        Account actualResult = accountService.save(account);
 
-        Account actualResult = accountService.save(TEST_ACCOUNT);
-
-        assertThat(actualResult).isNotNull().isEqualTo(TEST_ACCOUNT);
+        assertThat(actualResult).isNotNull().isEqualTo(account);
     }
 
     @Test
     @DisplayName("should update existing account")
-    void shouldUpdateExistingAccount() {
-        Account account = AccountTestBuilder.anAccount()
-                .withId(100L)
-                .withPlayerId(100L)
-                .build();
-        Account updatedAccount = AccountTestBuilder.anAccount()
-                .withId(account.getId())
-                .withPlayerId(account.getPlayerId())
-                .withCurrentBalance(new BigDecimal("500"))
-                .build();
-        Optional<Account> expected = Optional.of(updatedAccount);
+    void shouldUpdateExistingAccount() throws DatabaseException {
+        TEST_ACCOUNT_IVAN.setCurrentBalance(new BigDecimal("900.00"));
+        accountService.update(TEST_ACCOUNT_IVAN);
 
-        doReturn(account)
-                .when(accountRepository).save(account);
+        Optional<Account> actualResult = accountService.findById(TEST_ACCOUNT_IVAN.getId());
 
-        accountService.save(account);
-        accountService.update(updatedAccount);
-
-        doReturn(expected)
-                .when(accountRepository).findById(updatedAccount.getId());
-
-        Optional<Account> actualResult = accountService.findById(updatedAccount.getId());
-
-        assertThat(actualResult).isPresent().isEqualTo(expected);
+        assertThat(actualResult).isPresent().isEqualTo(Optional.of(TEST_ACCOUNT_IVAN));
     }
 
     @Test
     @DisplayName("should update balance correctly")
-    void shouldUpdateBalanceCorrectly() {
-        Account account = AccountTestBuilder.anAccount()
-                .withId(100L)
-                .withPlayerId(100L)
-                .withCurrentBalance(BigDecimal.ZERO)
-                .build();
-        BigDecimal updatedBalance = account.getCurrentBalance()
-                .add(new BigDecimal("600"));
+    void shouldUpdateBalanceCorrectly() throws DatabaseException {
+        Optional<Account> expected = Optional.of(TEST_ACCOUNT_IVAN);
+        BigDecimal updatedBalance = TEST_ACCOUNT_IVAN.getCurrentBalance()
+                .add(new BigDecimal("600.00"));
 
-        doReturn(account)
-                .when(accountRepository).save(account);
+        accountService.updateBalance(TEST_ACCOUNT_IVAN, updatedBalance);
+        Optional<Account> actualResult = accountService.findById(TEST_ACCOUNT_IVAN.getId());
 
-        Account actualResult = accountService.save(account);
-        accountService.updateBalance(actualResult, updatedBalance);
-
-        assertThat(actualResult).isNotNull().isEqualTo(account);
-        assertThat(actualResult.getCurrentBalance()).isEqualTo(updatedBalance.toString());
+        assertThat(actualResult).isPresent().isEqualTo(expected);
+        assertThat(TEST_ACCOUNT_IVAN.getCurrentBalance()).isEqualTo(updatedBalance);
     }
 
     @Test
     @DisplayName("should throw exception when balance incorrect")
-    void shouldThrowInvalidFundsExceptionWhenBalanceIncorrect() {
+    void shouldThrowInvalidFundsExceptionWhenBalanceIncorrect() throws DatabaseException {
         Account account = AccountTestBuilder.anAccount()
-                .withId(100L)
-                .withPlayerId(100L)
+                .withPlayerId(TEST_PLAYER_IVAN.getId())
                 .withCurrentBalance(BigDecimal.ZERO)
+                .withCreatedAt(LocalDateTime.now())
                 .build();
-        BigDecimal updatedBalance = account.getCurrentBalance().add(new BigDecimal("-500"));
+        BigDecimal updatedBalance = account.getCurrentBalance().add(new BigDecimal("-500.00"));
 
-        doReturn(account)
-                .when(accountRepository).save(account);
         Account savedAccount = accountService.save(account);
         assertThat(savedAccount).isNotNull().isEqualTo(account);
         assertThrows(InvalidFundsException.class, () -> accountService.updateBalance(account, updatedBalance));
@@ -185,22 +147,12 @@ class AccountServiceImplTest {
 
     @Test
     @DisplayName("should delete account")
-    void shouldDeleteAccount() {
-        Account account = AccountTestBuilder.anAccount()
-                .withId(100L)
-                .withPlayerId(100L)
-                .withCurrentBalance(BigDecimal.ZERO)
-                .build();
+    void shouldDeleteAccount() throws DatabaseException {
+        Long accountId = TEST_ACCOUNT_ANDREW.getId();
+        boolean deleted = accountService.delete(TEST_ACCOUNT_ANDREW);
+        Optional<Account> actualResult = accountService.findById(accountId);
 
-        doReturn(account)
-                .when(accountRepository).save(account);
-        doReturn(Optional.empty())
-                .when(accountRepository).findById(account.getId());
-
-        Account savedAccount = accountService.save(account);
-        Optional<Account> actualResult = accountService.findById(account.getId());
-
-        assertThat(savedAccount).isNotNull().isEqualTo(account);
+        assertThat(deleted).isTrue();
         assertThat(actualResult).isEmpty();
     }
 }

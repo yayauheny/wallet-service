@@ -1,6 +1,7 @@
 package io.ylab.walletservice.core.repository;
 
 import io.ylab.walletservice.core.domain.Transaction;
+import io.ylab.walletservice.exception.DatabaseException;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -20,7 +21,7 @@ public interface TransactionRepository<K> {
      * @param id The identifier of the transaction to find.
      * @return An optional containing the transaction entity if found, otherwise empty.
      */
-    Optional<Transaction> findById(K id);
+    Optional<Transaction> findById(K id) throws DatabaseException;
 
     /**
      * Retrieves a list of transactions within a specified period for a given account.
@@ -30,7 +31,7 @@ public interface TransactionRepository<K> {
      * @param accountId  The identifier of the account for which transactions are retrieved.
      * @return A list of transaction entities.
      */
-    List<Transaction> findByPeriod(LocalDateTime from, LocalDateTime to, Long accountId);
+    List<Transaction> findByPeriod(LocalDateTime from, LocalDateTime to, Long accountId) throws DatabaseException;
 
     /**
      * Retrieves a list of transactions for a given account.
@@ -38,14 +39,14 @@ public interface TransactionRepository<K> {
      * @param accountId The identifier of the account for which transactions are retrieved.
      * @return A list of transaction entities.
      */
-    List<Transaction> findAllByAccountId(Long accountId);
+    List<Transaction> findAllByAccountId(Long accountId) throws DatabaseException;
 
     /**
      * Retrieves a list of all transactions in the repository.
      *
      * @return A list of transaction entities.
      */
-    List<Transaction> findAll();
+    List<Transaction> findAll() throws DatabaseException;
 
     /**
      * Saves a new transaction entity.
@@ -53,7 +54,7 @@ public interface TransactionRepository<K> {
      * @param transaction The transaction entity to be saved.
      * @return The saved transaction entity.
      */
-    Transaction save(Transaction transaction);
+    Transaction save(Transaction transaction) throws DatabaseException;
 
     /**
      * Deletes an existing transaction entity.
@@ -61,6 +62,6 @@ public interface TransactionRepository<K> {
      * @param transaction The transaction entity to be deleted.
      * @return {@code true} if the deletion is successful, otherwise {@code false}.
      */
-    boolean delete(Transaction transaction);
+    boolean delete(Transaction transaction) throws DatabaseException;
 }
 

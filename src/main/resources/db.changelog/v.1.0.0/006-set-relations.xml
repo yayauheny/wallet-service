@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.10.xsd">
+
+    <changeSet id="000-create-schemas" author="yayauheny">
+        <addForeignKeyConstraint baseTableName="accounts"
+                                 baseTableSchemaName="wallet_service"
+                                 baseColumnNames="currency_code"
+                                 constraintName="fk_account_currency_code"
+                                 referencedTableSchemaName="wallet_service"
+                                 referencedTableName="currencies"
+                                 referencedColumnNames="code"
+                                 onUpdate="CASCADE"
+                                 onDelete="SET NULL"/>
+
+        <addForeignKeyConstraint baseTableName="accounts"
+                                 baseTableSchemaName="wallet_service"
+                                 baseColumnNames="player_id"
+                                 constraintName="fk_player_id"
+                                 referencedTableSchemaName="wallet_service"
+                                 referencedTableName="players"
+                                 referencedColumnNames="id"
+                                 onUpdate="CASCADE"
+                                 onDelete="CASCADE"/>
+
+        <addForeignKeyConstraint baseTableName="transactions"
+                                 baseTableSchemaName="wallet_service"
+                                 baseColumnNames="currency_code"
+                                 constraintName="fk_transaction_currency_code"
+                                 referencedTableSchemaName="wallet_service"
+                                 referencedTableName="currencies"
+                                 referencedColumnNames="code"
+                                 onUpdate="CASCADE"
+                                 onDelete="SET NULL"/>
+
+        <addForeignKeyConstraint baseTableName="transactions"
+                                 baseTableSchemaName="wallet_service"
+                                 baseColumnNames="participant_account_id"
+                                 constraintName="fk_participant_account_id"
+                                 referencedTableSchemaName="wallet_service"
+                                 referencedTableName="accounts"
+                                 referencedColumnNames="id"
+                                 onUpdate="CASCADE"
+                                 onDelete="CASCADE"/>
+    </changeSet>
+
+</databaseChangeLog>

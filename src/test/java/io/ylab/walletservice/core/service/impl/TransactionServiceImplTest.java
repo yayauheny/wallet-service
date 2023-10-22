@@ -1,66 +1,66 @@
 package io.ylab.walletservice.core.service.impl;
 
-import io.ylab.walletservice.core.domain.Account;
 import io.ylab.walletservice.core.domain.Transaction;
 import io.ylab.walletservice.core.domain.TransactionType;
-import io.ylab.walletservice.core.repository.impl.TransactionRepositoryImpl;
+import io.ylab.walletservice.exception.DatabaseException;
 import io.ylab.walletservice.exception.InvalidFundsException;
 import io.ylab.walletservice.exception.InvalidIdException;
 import io.ylab.walletservice.exception.TransactionException;
-import io.ylab.walletservice.testutil.AccountTestBuilder;
+import io.ylab.walletservice.testutil.PostgresTestcontainer;
+import io.ylab.walletservice.testutil.TestObjectsUtil;
 import io.ylab.walletservice.testutil.TransactionTestBuilder;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import static io.ylab.walletservice.testutil.TestObjectsUtil.TEST_ACCOUNT;
-import static io.ylab.walletservice.testutil.TestObjectsUtil.TEST_CURRENCY;
-import static io.ylab.walletservice.testutil.TestObjectsUtil.TEST_PLAYER;
-import static io.ylab.walletservice.testutil.TestObjectsUtil.TEST_TRANSACTION;
+import static io.ylab.walletservice.testutil.TestObjectsUtil.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doReturn;
 
 @ExtendWith(MockitoExtension.class)
 class TransactionServiceImplTest {
 
-    @InjectMocks
-    TransactionServiceImpl transactionService;
-    @Mock
-    TransactionRepositoryImpl transactionRepository;
+    static TransactionServiceImpl transactionService = new TransactionServiceImpl();
+    static CurrencyServiceImpl currencyService = new CurrencyServiceImpl();
+    static PlayerServiceImpl playerService = new PlayerServiceImpl();
+    static AccountServiceImpl accountService = new AccountServiceImpl();
+
+    @BeforeAll
+    static void startContainer() {
+        PostgresTestcontainer.init();
+        TestObjectsUtil.createObjects(currencyService, playerService, accountService);
+        try {
+            transactionService.save(TEST_TRANSACTION, TEST_ACCOUNT_HANNA);
+        } catch (DatabaseException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @AfterAll
+    static void closeContainer() {
+        PostgresTestcontainer.close();
+    }
 
     @Test
     @DisplayName("should find existing transaction by id")
-    void shouldFindTransactionById() {
-        Long TransactionId = TEST_TRANSACTION.getId();
+    void shouldFindTransactionById() throws DatabaseException {
         Optional<Transaction> expectedTransaction = Optional.of(TEST_TRANSACTION);
-
-        doReturn(expectedTransaction)
-                .when(transactionRepository).findById(TransactionId);
-
-        Optional<Transaction> actualResult = transactionService.findById(TransactionId);
+        Optional<Transaction> actualResult = transactionService.findById(TEST_TRANSACTION.getId());
 
         assertThat(actualResult).isPresent().isEqualTo(expectedTransaction);
     }
 
     @Test
     @DisplayName("should return an empty optional when transaction not found")
-    void shouldReturnEmptyOptionalWhenTransactionNotFound() {
-        Optional<Transaction> expectedTransaction = Optional.empty();
-
-        doReturn(expectedTransaction)
-                .when(transactionRepository).findById(any());
-
-        Optional<Transaction> actualResult = transactionService.findById(0L);
+    void shouldReturnEmptyOptionalWhenTransactionNotFound() throws DatabaseException {
+        Optional<Transaction> actualResult = transactionService.findById(999L);
 
         assertThat(actualResult).isEmpty();
     }
@@ -76,93 +76,59 @@ class TransactionServiceImplTest {
     }
 
     @Test
-    @DisplayName("should return all transactions")
-    void shouldReturnAllTransactions() {
-        int expectedSize = 1;
-
-        doReturn(List.of(TEST_TRANSACTION))
-                .when(transactionRepository).findAll();
-
-        List<Transaction> actualResult = transactionService.findAll();
-
-        assertThat(actualResult).hasSize(expectedSize).containsExactlyInAnyOrder(TEST_TRANSACTION);
-    }
-
-    @Test
-    @DisplayName("should return an empty list if no transactions found")
-    void shouldReturnAnEmptyListIfNoTransactionsFound() {
-        doReturn(Collections.emptyList())
-                .when(transactionRepository).findAll();
-
-        List<Transaction> actualResult = transactionService.findAll();
-
-        assertThat(actualResult).isEmpty();
-    }
-
-    @Test
     @DisplayName("should save and return saved transaction")
-    void shouldSaveAndReturnTransaction() {
-        Account account = AccountTestBuilder.anAccount()
-                .withPlayerId(TEST_PLAYER.getId())
-                .withId(999L)
-                .withCurrentBalance(new BigDecimal("200"))
-                .withCurrency(TEST_CURRENCY)
-                .build();
-        doReturn(TEST_TRANSACTION)
-                .when(transactionRepository).save(TEST_TRANSACTION);
+    void shouldSaveAndReturnTransaction() throws DatabaseException {
+        Transaction actualResult = transactionService.save(TEST_TRANSACTION_CREDIT, TEST_ACCOUNT_HANNA);
 
-        Transaction actualResult = transactionService.save(TEST_TRANSACTION, account);
-
-        assertThat(actualResult).isNotNull().isEqualTo(TEST_TRANSACTION);
+        assertThat(actualResult).isNotNull().isEqualTo(TEST_TRANSACTION_CREDIT);
     }
 
     @Test
     @DisplayName("should throw TransactionException when amount is bigger than current balance")
     void shouldThrowTransactionExceptionWhenAmountBiggerThanBalance() {
         Transaction transaction = TransactionTestBuilder.aTransaction()
-                .withId(999L)
-                .withCurrency(TEST_CURRENCY)
+                .withAmount(new BigDecimal("1200.00"))
                 .withType(TransactionType.DEBIT)
-                .withAmount(new BigDecimal("600"))
+                .withCreatedAt(LOCAL_DATE_TIME)
+                .withCurrencyCode("EUR")
+                .withParticipantAccount(TEST_ACCOUNT_HANNA)
                 .build();
 
-        assertThrows(TransactionException.class, () -> transactionService.processTransactionAndUpdateAccount(transaction, TEST_ACCOUNT));
+        assertThrows(TransactionException.class, () -> transactionService.processTransactionAndUpdateAccount(transaction, TEST_ACCOUNT_HANNA));
     }
 
     @Test
     @DisplayName("should throw InvalidFundsException when amount is negative")
     void shouldThrowInvalidFundsExceptionWhenAmountIsNegative() {
         Transaction transaction = TransactionTestBuilder.aTransaction()
-                .withId(999L)
-                .withCurrency(TEST_CURRENCY)
+                .withAmount(new BigDecimal("-12.00"))
                 .withType(TransactionType.DEBIT)
-                .withAmount(new BigDecimal("-100"))
+                .withCreatedAt(LOCAL_DATE_TIME)
+                .withCurrencyCode("EUR")
+                .withParticipantAccount(TEST_ACCOUNT_HANNA)
                 .build();
 
-        assertThrows(InvalidFundsException.class, () -> transactionService.processTransactionAndUpdateAccount(transaction, TEST_ACCOUNT));
+        assertThrows(InvalidFundsException.class, () -> transactionService.processTransactionAndUpdateAccount(transaction, TEST_ACCOUNT_ANDREW));
     }
 
     @Test
     @DisplayName("should throw TransactionException when currency not set")
     void shouldThrowTransactionExceptionWhenCurrencyNotSet() {
         Transaction transaction = TransactionTestBuilder.aTransaction()
-                .withId(999L)
-                .withCurrency(null)
-                .withType(TransactionType.CREDIT)
-                .withAmount(new BigDecimal("300"))
+                .withAmount(new BigDecimal("12.00"))
+                .withType(TransactionType.DEBIT)
+                .withCreatedAt(LOCAL_DATE_TIME)
+                .withParticipantAccount(TEST_ACCOUNT_HANNA)
                 .build();
 
-        assertThrows(TransactionException.class, () -> transactionService.processTransactionAndUpdateAccount(transaction, TEST_ACCOUNT));
+        assertThrows(TransactionException.class, () -> transactionService.processTransactionAndUpdateAccount(transaction, TEST_ACCOUNT_ANDREW));
     }
 
     @Test
     @DisplayName("should return all transactions for specified account")
-    void shouldReturnAllTransactionsByAccountId() {
-        Long accountId = TEST_ACCOUNT.getId();
+    void shouldReturnAllTransactionsByAccountId() throws DatabaseException {
+        Long accountId = TEST_ACCOUNT_HANNA.getId();
         int expectedSize = 1;
-
-        doReturn(List.of(TEST_TRANSACTION))
-                .when(transactionRepository).findAllByAccountId(accountId);
 
         List<Transaction> actualResult = transactionService.findAllByAccountId(accountId);
 
@@ -171,16 +137,19 @@ class TransactionServiceImplTest {
 
     @Test
     @DisplayName("should delete transaction")
-    void shouldDeleteTransaction() {
-        doReturn(TEST_TRANSACTION)
-                .when(transactionRepository).save(TEST_TRANSACTION);
-        doReturn(Optional.empty())
-                .when(transactionRepository).findById(TEST_TRANSACTION.getId());
-
-        Transaction savedTransaction = transactionService.save(TEST_TRANSACTION, TEST_ACCOUNT);
+    void shouldDeleteTransaction() throws DatabaseException {
+        transactionService.delete(TEST_TRANSACTION);
         Optional<Transaction> actualResult = transactionService.findById(TEST_TRANSACTION.getId());
 
-        assertThat(savedTransaction).isNotNull().isEqualTo(TEST_TRANSACTION);
         assertThat(actualResult).isEmpty();
+    }
+
+    @Test
+    @DisplayName("should return all transactions")
+    void shouldReturnAllTransactions() throws DatabaseException {
+        int expectedSize = 1;
+        List<Transaction> actualResult = transactionService.findAll();
+
+        assertThat(actualResult).hasSize(expectedSize).containsExactlyInAnyOrder(TEST_TRANSACTION_CREDIT);
     }
 }

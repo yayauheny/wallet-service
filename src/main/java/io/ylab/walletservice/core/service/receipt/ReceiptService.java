@@ -1,10 +1,11 @@
 package io.ylab.walletservice.core.service.receipt;
 
 import io.ylab.walletservice.api.Validator;
-import io.ylab.walletservice.core.domain.Receipt;
+import io.ylab.walletservice.core.dto.ReceiptDto;
 import io.ylab.walletservice.core.domain.Transaction;
 import io.ylab.walletservice.core.domain.TransactionType;
 import io.ylab.walletservice.core.service.impl.TransactionServiceImpl;
+import io.ylab.walletservice.exception.DatabaseException;
 import io.ylab.walletservice.exception.ReceiptBuildingException;
 import io.ylab.walletservice.util.DateTimeUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -40,12 +41,12 @@ public abstract class ReceiptService {
     /**
      * Builds a receipt using the provided template and saves it as a text file.
      *
-     * @param receipt The receipt to build.
+     * @param receiptDto The receipt to build.
      * @return The completed receipt.
      * @throws ReceiptBuildingException if exception caused while saving receipt to the file.
      */
-    public String buildReceipt(Receipt receipt) {
-        String completedReceipt = buildTemplate(receipt);
+    public String buildReceipt(ReceiptDto receiptDto) throws DatabaseException {
+        String completedReceipt = buildTemplate(receiptDto);
         saveReceiptAsTxt(completedReceipt);
         return completedReceipt;
     }
@@ -76,20 +77,20 @@ public abstract class ReceiptService {
     /**
      * Builds the template for the receipt.
      *
-     * @param receipt The receipt to build the template for.
+     * @param receiptDto The receipt to build the template for.
      * @return The receipt template.
      */
-    public abstract String buildTemplate(Receipt receipt);
+    public abstract String buildTemplate(ReceiptDto receiptDto) throws DatabaseException;
 
     /**
      * Builds the body of the transaction section in the receipt.
      *
-     * @param receipt The receipt containing transactions.
+     * @param receiptDto The receipt containing transactions.
      * @return The transaction body.
      */
-    public String buildTransactionBody(Receipt receipt) {
-        Validator.validateReceiptForMoneyStatement(receipt);
-        List<Transaction> transactions = transactionService.findByPeriod(receipt.from(), receipt.to(), receipt.account().getId());
+    public String buildTransactionBody(ReceiptDto receiptDto) throws DatabaseException {
+        Validator.validateReceiptForMoneyStatement(receiptDto);
+        List<Transaction> transactions = transactionService.findByPeriod(receiptDto.from(), receiptDto.to(), receiptDto.account().getId());
         String transactionEnd = buildTransactionEnd(transactions);
         return """
                 %s | %s | %s

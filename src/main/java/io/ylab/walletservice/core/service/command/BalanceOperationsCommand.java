@@ -6,6 +6,7 @@ import io.ylab.walletservice.core.domain.Player;
 import io.ylab.walletservice.core.domain.Transaction;
 import io.ylab.walletservice.core.domain.TransactionType;
 import io.ylab.walletservice.core.service.impl.TransactionServiceImpl;
+import io.ylab.walletservice.exception.DatabaseException;
 import io.ylab.walletservice.exception.TransactionException;
 
 import java.io.IOException;
@@ -105,6 +106,8 @@ public class BalanceOperationsCommand implements Command {
         } catch (TransactionException e) {
             System.err.println(e.getMessage());
             execute(player);
+        } catch (DatabaseException e) {
+            throw new RuntimeException(e);
         }
     }
 }

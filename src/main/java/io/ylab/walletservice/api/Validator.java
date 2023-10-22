@@ -1,6 +1,6 @@
 package io.ylab.walletservice.api;
 
-import io.ylab.walletservice.core.domain.Receipt;
+import io.ylab.walletservice.core.dto.ReceiptDto;
 import io.ylab.walletservice.core.domain.Transaction;
 import io.ylab.walletservice.core.domain.TransactionType;
 import io.ylab.walletservice.exception.IncorrectPeriodException;
@@ -121,11 +121,11 @@ public class Validator {
     /**
      * Validates a receipt for basic information, ensuring that key components are not null.
      *
-     * @param receipt The receipt to validate.
+     * @param receiptDto The receipt to validate.
      * @throws ReceiptBuildingException If the receipt is missing essential information.
      */
-    public void validateReceiptForCheck(Receipt receipt) {
-        if (receipt.account() == null || receipt.player() == null || receipt.from() == null || receipt.to() == null) {
+    public void validateReceiptForCheck(ReceiptDto receiptDto) {
+        if (receiptDto.account() == null || receiptDto.player() == null || receiptDto.from() == null || receiptDto.to() == null) {
             throw new ReceiptBuildingException();
         }
     }
@@ -133,12 +133,12 @@ public class Validator {
     /**
      * Validates a receipt for money statement, ensuring it has essential information and a valid period.
      *
-     * @param receipt The receipt to validate.
+     * @param receiptDto The receipt to validate.
      * @throws ReceiptBuildingException If the receipt is missing essential information or has an incorrect period.
      */
-    public void validateReceiptForMoneyStatement(Receipt receipt) {
-        validateReceiptForCheck(receipt);
-        validateTransactionsPeriod(receipt.from(), receipt.to());
+    public void validateReceiptForMoneyStatement(ReceiptDto receiptDto) {
+        validateReceiptForCheck(receiptDto);
+        validateTransactionsPeriod(receiptDto.from(), receiptDto.to());
     }
 }
 

@@ -5,6 +5,7 @@ import io.ylab.walletservice.core.domain.Currency;
 import io.ylab.walletservice.core.domain.Player;
 import io.ylab.walletservice.core.service.impl.AccountServiceImpl;
 import io.ylab.walletservice.core.service.impl.PlayerServiceImpl;
+import io.ylab.walletservice.exception.DatabaseException;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -19,7 +20,6 @@ import java.util.List;
 public interface Command {
 
     Currency DEFAULT_CURRENCY = Currency.builder()
-            .id(1L)
             .rate(BigDecimal.ONE)
             .code("USD")
             .build();
@@ -42,7 +42,7 @@ public interface Command {
      *
      * @param player The player on which the command is executed.
      */
-    void execute(Player player);
+    void execute(Player player) throws DatabaseException;
 
     /**
      * Gets the name of the command.
@@ -56,7 +56,7 @@ public interface Command {
      *
      * @return The list of all players.
      */
-    default List<Player> printAllPlayers() {
+    default List<Player> printAllPlayers() throws DatabaseException {
         System.out.println("Список пользователей:");
         List<Player> players = playerService.findAll();
         for (Player player : players) {

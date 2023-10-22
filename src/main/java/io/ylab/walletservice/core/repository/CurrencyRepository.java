@@ -1,5 +1,8 @@
 package io.ylab.walletservice.core.repository;
 
+import io.ylab.walletservice.core.domain.Currency;
+import io.ylab.walletservice.exception.DatabaseException;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -8,9 +11,8 @@ import java.util.Optional;
  * manipulating currency entities in the repository.
  *
  * @param <K> The type of the identifier for the currency.
- * @param <E> The type of the currency entity.
  */
-public interface CurrencyRepository<K, E> {
+public interface CurrencyRepository<K> {
 
     /**
      * Finds a currency by its identifier.
@@ -18,7 +20,7 @@ public interface CurrencyRepository<K, E> {
      * @param id The identifier of the currency to find.
      * @return An optional containing the currency entity if found, otherwise empty.
      */
-    Optional<E> findById(K id);
+    Optional<Currency> findById(K id) throws DatabaseException;
 
     /**
      * Finds a currency by its code.
@@ -26,14 +28,14 @@ public interface CurrencyRepository<K, E> {
      * @param code The code of the currency to find.
      * @return An optional containing the currency entity if found, otherwise empty.
      */
-    Optional<E> findByCode(String code);
+    Optional<Currency> findByCode(String code) throws DatabaseException;
 
     /**
      * Retrieves a list of all currencies in the repository.
      *
      * @return A list of currency entities.
      */
-    List<E> findAll();
+    List<Currency> findAll() throws DatabaseException;
 
     /**
      * Saves a new currency entity or updates an existing one.
@@ -41,14 +43,14 @@ public interface CurrencyRepository<K, E> {
      * @param currency The currency entity to be saved or updated.
      * @return The saved or updated currency entity.
      */
-    E save(E currency);
+    Currency save(Currency currency) throws DatabaseException;
 
     /**
      * Updates an existing currency entity.
      *
      * @param currency The currency entity to be updated.
      */
-    void update(E currency);
+    void update(Currency currency) throws DatabaseException;
 
     /**
      * Deletes an existing currency entity.
@@ -56,6 +58,6 @@ public interface CurrencyRepository<K, E> {
      * @param currency The currency entity to be deleted.
      * @return {@code true} if the deletion is successful, otherwise {@code false}.
      */
-    boolean delete(E currency);
+    boolean delete(Currency currency) throws DatabaseException;
 }
 

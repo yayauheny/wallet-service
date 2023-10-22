@@ -3,6 +3,7 @@ package io.ylab.walletservice.core.service;
 
 import io.ylab.walletservice.core.domain.Transaction;
 import io.ylab.walletservice.core.domain.Account;
+import io.ylab.walletservice.exception.DatabaseException;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -22,7 +23,7 @@ public interface TransactionService<K> {
      * @param id The unique identifier of the transaction entity to find.
      * @return An {@link Optional} containing the found transaction entity, or an empty {@link Optional} if not found.
      */
-    Optional<Transaction> findById(K id);
+    Optional<Transaction> findById(K id) throws DatabaseException;
 
     /**
      * Retrieves a list of transactions within a specified period for a given account.
@@ -32,14 +33,14 @@ public interface TransactionService<K> {
      * @param accountId  The unique identifier of the account.
      * @return A list of transactions within the specified period for the given account.
      */
-    List<Transaction> findByPeriod(LocalDateTime from, LocalDateTime to, Long accountId);
+    List<Transaction> findByPeriod(LocalDateTime from, LocalDateTime to, Long accountId) throws DatabaseException;
 
     /**
      * Retrieves a list of all transaction entities.
      *
      * @return A list of all transaction entities.
      */
-    List<Transaction> findAll();
+    List<Transaction> findAll() throws DatabaseException;
 
     /**
      * Retrieves a list of all transactions associated with a specific account.
@@ -47,7 +48,7 @@ public interface TransactionService<K> {
      * @param accountId The unique identifier of the account.
      * @return A list of all transactions associated with the specified account.
      */
-    List<Transaction> findAllByAccountId(K accountId);
+    List<Transaction> findAllByAccountId(K accountId) throws DatabaseException;
 
     /**
      * Saves a new transaction entity and associates it with the provided account.
@@ -56,7 +57,7 @@ public interface TransactionService<K> {
      * @param account     The account to associate the transaction with.
      * @return The saved transaction entity.
      */
-    Transaction save(Transaction transaction, Account account);
+    Transaction save(Transaction transaction, Account account) throws DatabaseException;
 
     /**
      * Processes a transaction and updates the associated account.
@@ -64,7 +65,7 @@ public interface TransactionService<K> {
      * @param transaction The transaction to process.
      * @param account     The account to update.
      */
-    void processTransactionAndUpdateAccount(Transaction transaction, Account account);
+    void processTransactionAndUpdateAccount(Transaction transaction, Account account) throws DatabaseException;
 
     /**
      * Deletes an existing transaction entity.
@@ -72,6 +73,6 @@ public interface TransactionService<K> {
      * @param transaction The transaction entity to delete.
      * @return {@code true} if the deletion was successful, {@code false} otherwise.
      */
-    boolean delete(Transaction transaction);
+    boolean delete(Transaction transaction) throws DatabaseException;
 }
 

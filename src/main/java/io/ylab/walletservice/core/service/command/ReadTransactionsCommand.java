@@ -2,9 +2,10 @@ package io.ylab.walletservice.core.service.command;
 
 import io.ylab.walletservice.api.Auditor;
 import io.ylab.walletservice.core.domain.Player;
-import io.ylab.walletservice.core.domain.Receipt;
+import io.ylab.walletservice.core.dto.ReceiptDto;
 import io.ylab.walletservice.core.service.receipt.ReceiptService;
 import io.ylab.walletservice.core.service.receipt.SummaryReceiptService;
+import io.ylab.walletservice.exception.DatabaseException;
 import io.ylab.walletservice.exception.ReceiptBuildingException;
 import io.ylab.walletservice.util.DateTimeUtils;
 
@@ -25,20 +26,20 @@ public class ReadTransactionsCommand implements Command {
      * @param player The player on which the command is executed.
      */
     @Override
-    public void execute(Player player) {
+    public void execute(Player player) throws DatabaseException {
         System.out.println("Выберите период выписки:\n1 - ввести вручную\n2 - все транзакции");
         try {
             int choice = Integer.parseInt(READER.readLine());
-            Receipt receipt;
+            ReceiptDto receiptDto;
 
             switch (choice) {
-                case 1 -> receipt = readTransactionsByPeriod(player);
-                case 2 -> receipt = readAllTransactions(player);
+                case 1 -> receiptDto = readTransactionsByPeriod(player);
+                case 2 -> receiptDto = readAllTransactions(player);
                 default -> throw new InputMismatchException();
             }
 
             ReceiptService receiptService = SummaryReceiptService.getInstance();
-            System.out.println(receiptService.buildReceipt(receipt));
+            System.out.println(receiptService.buildReceipt(receiptDto));
             Auditor.log("player: %s created receipt".formatted(player.getUsername()));
         } catch (InputMismatchException e) {
             System.err.println("Некорректный ввод, попробуйте снова");
@@ -58,7 +59,7 @@ public class ReadTransactionsCommand implements Command {
         return "Получение списка транзакций";
     }
 
-    private Receipt readTransactionsByPeriod(Player player) {
+    private ReceiptDto readTransactionsByPeriod(Player player) {
         System.out.println("Введите дату начала истории транзакций (гггг.мм.дд):");
 
         try {
@@ -68,16 +69,16 @@ public class ReadTransactionsCommand implements Command {
             String inputDateTo = READER.readLine();
             LocalDateTime dateTo = LocalDateTime.parse(inputDateTo, DateTimeUtils.dateFormatter);
 
-            return new Receipt(player.getAccount(), player, dateFrom, dateTo);
+            return new ReceiptDto(player.getAccount(), player, dateFrom, dateTo);
         } catch (InputMismatchException | NumberFormatException | IOException e) {
             System.err.println("Некорректный ввод, попробуйте снова");
             return readTransactionsByPeriod(player);
         }
     }
 
-    private Receipt readAllTransactions(Player player) {
+    private ReceiptDto readAllTransactions(Player player) {
         LocalDateTime createdAt = player.getAccount().getCreatedAt();
-        return new Receipt(player.getAccount(), player, createdAt, LocalDateTime.now());
+        return new ReceiptDto(player.getAccount(), player, createdAt, LocalDateTime.now());
     }
 }
 

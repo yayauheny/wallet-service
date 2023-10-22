@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.10.xsd">
+
+    <changeSet id="002-create-currencies-table" author="yayauheny">
+        <createTable schemaName="wallet_service" tableName="currencies">
+            <column name="id" type="BIGINT" defaultValueComputed="nextval('wallet_service.currencies_seq')">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="rate" type="NUMERIC(16, 2)" defaultValue="0.0"/>
+            <column name="code" type="VARCHAR(3)">
+                <constraints unique="true" nullable="false"/>
+            </column>
+        </createTable>
+
+        <rollback>
+            <dropTable schemaName="wallet_service" tableName="currencies"/>
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>

@@ -5,6 +5,7 @@ import io.ylab.walletservice.api.PasswordHasher;
 import io.ylab.walletservice.core.domain.Account;
 import io.ylab.walletservice.core.domain.Player;
 import io.ylab.walletservice.core.domain.PlayerRole;
+import io.ylab.walletservice.exception.DatabaseException;
 import io.ylab.walletservice.util.DateTimeUtils;
 
 import java.io.IOException;
@@ -25,7 +26,7 @@ public class CreateCommand implements Command {
      * @param player The player on which the command is executed.
      */
     @Override
-    public void execute(Player player) {
+    public void execute(Player player) throws DatabaseException {
         System.out.println("Регистрация нового игрока:");
         System.out.println("Введите имя:");
         try {
@@ -73,7 +74,7 @@ public class CreateCommand implements Command {
      * @param birthDate The birthdate of the player.
      * @return The registered player.
      */
-    private Player registerPlayer(String username, PlayerRole role, byte[] password, LocalDate birthDate) {
+    private Player registerPlayer(String username, PlayerRole role, byte[] password, LocalDate birthDate) throws DatabaseException {
         Player player = Player.builder()
                 .username(username)
                 .role(role)
@@ -82,7 +83,7 @@ public class CreateCommand implements Command {
                 .build();
         Account playerAccount = Account.builder()
                 .playerId(player.getId())
-                .currency(DEFAULT_CURRENCY)
+                .currencyCode(DEFAULT_CURRENCY.getCode())
                 .build();
         player.setAccount(playerAccount);
         playerService.save(player);

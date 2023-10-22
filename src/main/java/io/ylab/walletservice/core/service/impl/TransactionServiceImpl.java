@@ -1,6 +1,8 @@
 package io.ylab.walletservice.core.service.impl;
 
+import io.ylab.walletservice.core.domain.Currency;
 import io.ylab.walletservice.core.domain.Transaction;
+import io.ylab.walletservice.exception.DatabaseException;
 import lombok.AllArgsConstructor;
 import io.ylab.walletservice.core.domain.Account;
 import io.ylab.walletservice.exception.TransactionException;
@@ -22,10 +24,12 @@ import java.util.Optional;
 public class TransactionServiceImpl implements TransactionService<Long> {
 
     private final TransactionRepositoryImpl transactionRepository;
-    private final AccountServiceImpl accountService;
+    private AccountServiceImpl accountService;
+    private final CurrencyServiceImpl currencyService;
 
     public TransactionServiceImpl() {
         this.transactionRepository = TransactionRepositoryImpl.getInstance();
+        this.currencyService = new CurrencyServiceImpl();
         this.accountService = new AccountServiceImpl();
     }
 
@@ -33,54 +37,77 @@ public class TransactionServiceImpl implements TransactionService<Long> {
      * {@inheritDoc}
      */
     @Override
-    public Optional<Transaction> findById(Long id) {
+    public Optional<Transaction> findById(Long id) throws DatabaseException {
         Validator.validateId(id);
-        return transactionRepository.findById(id);
+
+        Optional<Transaction> transaction = transactionRepository.findById(id);
+        if (transaction.isPresent()) {
+            setDependencies(transaction.get());
+        }
+        return transaction;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public List<Transaction> findByPeriod(LocalDateTime from, LocalDateTime to, Long accountId) {
+    public List<Transaction> findByPeriod(LocalDateTime from, LocalDateTime to, Long accountId) throws DatabaseException {
         Validator.validateId(accountId);
         Validator.validateTransactionsPeriod(from, to);
-        return transactionRepository.findByPeriod(from, to, accountId);
+
+        List<Transaction> transactions = transactionRepository.findByPeriod(from, to, accountId);
+        for (Transaction transaction : transactions) {
+            setDependencies(transaction);
+        }
+        return transactions;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public List<Transaction> findAll() {
-        return transactionRepository.findAll();
+    public List<Transaction> findAll() throws DatabaseException {
+        List<Transaction> transactions = transactionRepository.findAll();
+        for (Transaction transaction : transactions) {
+            setDependencies(transaction);
+        }
+        return transactions;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public List<Transaction> findAllByAccountId(Long accountId) {
+    public List<Transaction> findAllByAccountId(Long accountId) throws DatabaseException {
         Validator.validateId(accountId);
-        return transactionRepository.findAllByAccountId(accountId);
+
+        List<Transaction> transactions = transactionRepository.findAllByAccountId(accountId);
+        for (Transaction transaction : transactions) {
+            setDependencies(transaction);
+        }
+        return transactions;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Transaction save(Transaction transaction, Account account) {
+    public Transaction save(Transaction transaction, Account account) throws DatabaseException {
         transaction.setParticipantAccount(account);
+        transaction.setParticipantAccountId(account.getId());
         Validator.validateTransaction(transaction);
         account.getTransactions().add(transaction);
-        return transactionRepository.save(transaction);
+
+        Transaction savedTransaction = transactionRepository.save(transaction);
+        setDependencies(savedTransaction);
+        return savedTransaction;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void processTransactionAndUpdateAccount(Transaction transaction, Account account) {
+    public void processTransactionAndUpdateAccount(Transaction transaction, Account account) throws DatabaseException {
         transaction.setParticipantAccount(account);
         Validator.validateTransaction(transaction);
         Optional<Transaction> maybeTransaction = findById(transaction.getId());
@@ -103,8 +130,15 @@ public class TransactionServiceImpl implements TransactionService<Long> {
      * {@inheritDoc}
      */
     @Override
-    public boolean delete(Transaction transaction) {
+    public boolean delete(Transaction transaction) throws DatabaseException {
         return transactionRepository.delete(transaction);
+    }
+
+    private void setDependencies(Transaction transaction) throws DatabaseException {
+        Optional<Account> participantAccount = accountService.findById(transaction.getParticipantAccountId());
+        Optional<Currency> currency = currencyService.findByCode(transaction.getCurrencyCode());
+        participantAccount.ifPresent(transaction::setParticipantAccount);
+        currency.ifPresent(transaction::setCurrency);
     }
 }
 
