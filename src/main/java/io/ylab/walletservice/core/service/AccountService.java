@@ -2,6 +2,9 @@ package io.ylab.walletservice.core.service;
 
 import io.ylab.walletservice.core.domain.Account;
 import io.ylab.walletservice.core.domain.Transaction;
+import io.ylab.walletservice.core.dto.account.AccountCreateDto;
+import io.ylab.walletservice.core.dto.account.AccountResponse;
+import io.ylab.walletservice.core.dto.account.AccountUpdateDto;
 import io.ylab.walletservice.exception.DatabaseException;
 
 import java.math.BigDecimal;
@@ -56,14 +59,14 @@ public interface AccountService<K> {
      * @param account The account to save.
      * @return The saved account.
      */
-    Account save(Account account) throws DatabaseException;
+    Account save(AccountCreateDto account) throws DatabaseException;
 
     /**
      * Updates an existing {@link Account}.
      *
      * @param account The account to update.
      */
-    void update(Account account) throws DatabaseException;
+    void update(AccountUpdateDto account) throws DatabaseException;
 
     /**
      * Updates the balance of an existing {@link Account}.
@@ -71,14 +74,14 @@ public interface AccountService<K> {
      * @param account          The account whose balance will be updated.
      * @param updatedBalance   The new balance value.
      */
-    void updateBalance(Account account, BigDecimal updatedBalance) throws DatabaseException;
+    void updateBalance(AccountUpdateDto account, BigDecimal updatedBalance) throws DatabaseException;
 
     /**
      * Deletes an existing {@link Account}.
      *
-     * @param account The account to delete.
+     * @param id The account id to delete.
      * @return {@code true} if the deletion was successful, {@code false} otherwise.
      */
-    boolean delete(Account account) throws DatabaseException;
+    boolean delete(Long id) throws DatabaseException;
 }
 

@@ -1,14 +1,19 @@
 package io.ylab.walletservice.core.service.impl;
 
+import io.ylab.walletservice.api.PasswordHasher;
 import io.ylab.walletservice.api.Validator;
 import io.ylab.walletservice.core.domain.Account;
 import io.ylab.walletservice.core.domain.Player;
 import io.ylab.walletservice.core.domain.Transaction;
+import io.ylab.walletservice.core.dto.player.PlayerCreateDto;
+import io.ylab.walletservice.core.dto.player.PlayerUpdateDto;
+import io.ylab.walletservice.core.mapper.PlayerMapper;
 import io.ylab.walletservice.core.repository.impl.PlayerRepositoryImpl;
 import io.ylab.walletservice.core.service.PlayerService;
 import io.ylab.walletservice.exception.DatabaseException;
 import lombok.AllArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -35,9 +40,7 @@ public class PlayerServiceImpl implements PlayerService<Long> {
     public Optional<Player> findById(Long id) throws DatabaseException {
         Validator.validateId(id);
         Optional<Player> player = playerRepository.findById(id);
-        if (player.isPresent()) {
-            setDependencies(player.get());
-        }
+        player.ifPresent(this::setDependencies);
         return player;
     }
 
@@ -47,9 +50,7 @@ public class PlayerServiceImpl implements PlayerService<Long> {
     @Override
     public Optional<Player> findByUsername(String username) throws DatabaseException {
         Optional<Player> player = playerRepository.findByUsername(username);
-        if (player.isPresent()) {
-            setDependencies(player.get());
-        }
+        player.ifPresent(this::setDependencies);
         return player;
     }
 
@@ -71,19 +72,18 @@ public class PlayerServiceImpl implements PlayerService<Long> {
     @Override
     public List<Transaction> getTransactions(Long playerId) throws DatabaseException {
         Validator.validateId(playerId);
-        Optional<Account> maybeAccount = accountService.findByPlayerId(playerId);
-        if (maybeAccount.isPresent()) {
-            return maybeAccount.get().getTransactions();
-        } else {
-            throw new DatabaseException("Account not exists");
-        }
+        Optional<Account> account = accountService.findByPlayerId(playerId);
+        return account.isPresent()
+                ? account.get().getTransactions()
+                : new ArrayList<>();
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Player save(Player player) throws DatabaseException {
+    public Player save(PlayerCreateDto request) throws DatabaseException {
+        Player player = PlayerMapper.INSTANCE.fromPlayerCreateDto(request);
         Player savedPlayer = playerRepository.save(player);
         setDependencies(savedPlayer);
         return savedPlayer;
@@ -93,7 +93,8 @@ public class PlayerServiceImpl implements PlayerService<Long> {
      * {@inheritDoc}
      */
     @Override
-    public void update(Player player) throws DatabaseException {
+    public void update(PlayerUpdateDto request) throws DatabaseException {
+        Player player = PlayerMapper.INSTANCE.fromRequest(request);
         playerRepository.update(player);
         setDependencies(player);
     }
@@ -102,8 +103,20 @@ public class PlayerServiceImpl implements PlayerService<Long> {
      * {@inheritDoc}
      */
     @Override
-    public boolean delete(Player player) throws DatabaseException {
-        return playerRepository.delete(player);
+    public boolean delete(Long id) throws DatabaseException {
+        return playerRepository.delete(id);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean verifyPassword(String password, String username) {
+        Optional<Player> player = playerRepository.findByUsername(username);
+        if (player.isPresent()) {
+            byte[] existingPlayerPassword = player.get().getHashedPassword();
+            return PasswordHasher.checkPassword(password, existingPlayerPassword);
+        } else return false;
     }
 
     private void setDependencies(Player player) throws DatabaseException {

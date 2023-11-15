@@ -69,7 +69,7 @@ public class CurrencyServiceImpl implements CurrencyService<Long> {
      * {@inheritDoc}
      */
     @Override
-    public boolean delete(Currency currency) throws DatabaseException {
-        return currencyRepository.delete(currency);
+    public boolean delete(Long id) throws DatabaseException {
+        return currencyRepository.delete(id);
     }
 }

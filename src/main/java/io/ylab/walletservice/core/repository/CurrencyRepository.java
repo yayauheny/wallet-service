@@ -55,9 +55,9 @@ public interface CurrencyRepository<K> {
     /**
      * Deletes an existing currency entity.
      *
-     * @param currency The currency entity to be deleted.
+     * @param id The currency id to be deleted.
      * @return {@code true} if the deletion is successful, otherwise {@code false}.
      */
-    boolean delete(Currency currency) throws DatabaseException;
+    boolean delete(Long id) throws DatabaseException;
 }
 

@@ -16,4 +16,5 @@ public class Currency {
     private Long id;
     private BigDecimal rate;
     private String code;
+
 }

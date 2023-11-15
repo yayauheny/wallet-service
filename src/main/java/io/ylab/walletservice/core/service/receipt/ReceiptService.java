@@ -1,7 +1,7 @@
 package io.ylab.walletservice.core.service.receipt;
 
 import io.ylab.walletservice.api.Validator;
-import io.ylab.walletservice.core.dto.ReceiptDto;
+import io.ylab.walletservice.core.dto.receipt.ReceiptDto;
 import io.ylab.walletservice.core.domain.Transaction;
 import io.ylab.walletservice.core.domain.TransactionType;
 import io.ylab.walletservice.core.service.impl.TransactionServiceImpl;

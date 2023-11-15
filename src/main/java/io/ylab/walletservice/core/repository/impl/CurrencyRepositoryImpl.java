@@ -151,14 +151,14 @@ public class CurrencyRepositoryImpl implements CurrencyRepository<Long> {
      * {@inheritDoc}
      */
     @Override
-    public boolean delete(Currency currency) throws DatabaseException {
+    public boolean delete(Long id) throws DatabaseException {
         String query = """
                 DELETE FROM currencies
                 WHERE id=?;
                 """;
         try (Connection connection = ConnectionManager.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-            preparedStatement.setLong(1, currency.getId());
+            preparedStatement.setLong(1, id);
             return !preparedStatement.execute();
         } catch (SQLException e) {
             throw new DatabaseException(e.getMessage());

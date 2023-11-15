@@ -158,14 +158,14 @@ public class PlayerRepositoryImpl implements PlayerRepository<Long> {
      * {@inheritDoc}
      */
     @Override
-    public boolean delete(Player player) throws DatabaseException {
+    public boolean delete(Long id) throws DatabaseException {
         String query = """
                 DELETE FROM players
                 WHERE id=?;
                 """;
         try (Connection connection = ConnectionManager.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-            preparedStatement.setLong(1, player.getId());
+            preparedStatement.setLong(1, id);
             return !preparedStatement.execute();
         } catch (SQLException e) {
             throw new DatabaseException(e.getMessage());

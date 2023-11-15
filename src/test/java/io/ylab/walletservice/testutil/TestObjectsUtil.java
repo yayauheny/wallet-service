@@ -90,9 +90,9 @@ public class TestObjectsUtil {
             currencyService.save(TEST_CURRENCY_EUR);
             currencyService.save(TEST_CURRENCY_JPY);
 
-            playerService.save(TEST_PLAYER_IVAN);
-            playerService.save(TEST_PLAYER_ANDREW);
-            playerService.save(TEST_PLAYER_HANNA);
+//            playerService.save(TEST_PLAYER_IVAN);
+//            playerService.save(TEST_PLAYER_ANDREW);
+//            playerService.save(TEST_PLAYER_HANNA);
 
             TEST_ACCOUNT_IVAN.setPlayerId(TEST_PLAYER_IVAN.getId());
             TEST_ACCOUNT_ANDREW.setPlayerId(TEST_PLAYER_ANDREW.getId());

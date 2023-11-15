@@ -73,11 +73,11 @@ public interface AccountRepository<K> {
     /**
      * Deletes an existing account entity.
      *
-     * @param account The account entity to be deleted.
+     * @param id The account id to be deleted.
      * @return {@code true} if the deletion is successful, otherwise {@code false}.
      * @throws DatabaseException if a database access error occurs or
      *                           {@link Account} entity cannot be deleted.
      */
-    boolean delete(Account account) throws DatabaseException;
+    boolean delete(Long id) throws DatabaseException;
 }
 

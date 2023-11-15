@@ -55,9 +55,9 @@ public interface PlayerRepository<K> {
     /**
      * Deletes an existing player entity.
      *
-     * @param player The player entity to be deleted.
+     * @param id The player id to be deleted.
      * @return {@code true} if the deletion is successful, otherwise {@code false}.
      */
-    boolean delete(Player player) throws DatabaseException;
+    boolean delete(Long id) throws DatabaseException;
 }
 

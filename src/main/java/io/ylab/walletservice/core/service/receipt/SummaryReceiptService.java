@@ -1,6 +1,6 @@
 package io.ylab.walletservice.core.service.receipt;
 
-import io.ylab.walletservice.core.dto.ReceiptDto;
+import io.ylab.walletservice.core.dto.receipt.ReceiptDto;
 import io.ylab.walletservice.exception.DatabaseException;
 import io.ylab.walletservice.util.DateTimeUtils;
 import lombok.AccessLevel;
