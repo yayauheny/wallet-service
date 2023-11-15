@@ -3,6 +3,9 @@ package io.ylab.walletservice.core.service;
 
 import io.ylab.walletservice.core.domain.Transaction;
 import io.ylab.walletservice.core.domain.Account;
+import io.ylab.walletservice.core.dto.account.AccountCreateDto;
+import io.ylab.walletservice.core.dto.account.AccountUpdateDto;
+import io.ylab.walletservice.core.dto.transaction.TransactionRequest;
 import io.ylab.walletservice.exception.DatabaseException;
 
 import java.time.LocalDateTime;
@@ -62,17 +65,17 @@ public interface TransactionService<K> {
     /**
      * Processes a transaction and updates the associated account.
      *
-     * @param transaction The transaction to process.
-     * @param account     The account to update.
+     * @param transactionDto The TransactionRequest instance to process.
+     * @param accountDto     The AccountRequest instance to update.
      */
-    void processTransactionAndUpdateAccount(Transaction transaction, Account account) throws DatabaseException;
+    void processTransactionAndUpdateAccount(TransactionRequest transactionDto, AccountUpdateDto accountDto) throws DatabaseException;
 
     /**
      * Deletes an existing transaction entity.
      *
-     * @param transaction The transaction entity to delete.
+     * @param id The transaction id to delete.
      * @return {@code true} if the deletion was successful, {@code false} otherwise.
      */
-    boolean delete(Transaction transaction) throws DatabaseException;
+    boolean delete(Long id) throws DatabaseException;
 }
 

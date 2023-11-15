@@ -59,9 +59,9 @@ public interface TransactionRepository<K> {
     /**
      * Deletes an existing transaction entity.
      *
-     * @param transaction The transaction entity to be deleted.
+     * @param id The transaction id to be deleted.
      * @return {@code true} if the deletion is successful, otherwise {@code false}.
      */
-    boolean delete(Transaction transaction) throws DatabaseException;
+    boolean delete(Long id) throws DatabaseException;
 }
 

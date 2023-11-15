@@ -3,7 +3,7 @@ package io.ylab.walletservice.exception;
 /**
  * Thrown to indicate that exception with database occured.
  */
-public class DatabaseException extends Exception {
+public class DatabaseException extends RuntimeException {
 
     /**
      * Constructs an {@code DatabaseException} with default

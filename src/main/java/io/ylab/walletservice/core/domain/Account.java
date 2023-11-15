@@ -1,5 +1,7 @@
 package io.ylab.walletservice.core.domain;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import io.ylab.walletservice.core.dto.player.PlayerResponse;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;

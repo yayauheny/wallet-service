@@ -1,6 +1,6 @@
 package io.ylab.walletservice.api;
 
-import io.ylab.walletservice.core.dto.ReceiptDto;
+import io.ylab.walletservice.core.dto.receipt.ReceiptDto;
 import io.ylab.walletservice.core.domain.Transaction;
 import io.ylab.walletservice.core.domain.TransactionType;
 import io.ylab.walletservice.exception.IncorrectPeriodException;
@@ -33,6 +33,12 @@ public class Validator {
     public <T extends Number> void validateId(T id) {
         if (id == null || id.intValue() < 0) {
             throw new InvalidIdException("Cannot find by id = " + id);
+        }
+    }
+
+    public void validateForNull(Object... objects) {
+        for (Object o : objects) {
+            if (o == null) throw new NullPointerException();
         }
     }
 

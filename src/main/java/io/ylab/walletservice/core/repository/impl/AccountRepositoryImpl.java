@@ -161,7 +161,6 @@ public class AccountRepositoryImpl implements AccountRepository<Long> {
         String query = """
                 UPDATE accounts
                 SET current_balance=?,
-                    created_at=?,
                     currency_code=?,
                     player_id=?
                 WHERE id=?;
@@ -169,10 +168,9 @@ public class AccountRepositoryImpl implements AccountRepository<Long> {
         try (Connection connection = ConnectionManager.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(query)) {
             preparedStatement.setBigDecimal(1, account.getCurrentBalance());
-            preparedStatement.setObject(2, account.getCreatedAt());
-            preparedStatement.setString(3, account.getCurrencyCode());
-            preparedStatement.setLong(4, account.getPlayerId());
-            preparedStatement.setLong(5, account.getId());
+            preparedStatement.setString(2, account.getCurrencyCode());
+            preparedStatement.setLong(3, account.getPlayerId());
+            preparedStatement.setLong(4, account.getId());
 
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
@@ -184,14 +182,14 @@ public class AccountRepositoryImpl implements AccountRepository<Long> {
      * {@inheritDoc}
      */
     @Override
-    public boolean delete(Account account) throws DatabaseException {
+    public boolean delete(Long id) throws DatabaseException {
         String query = """
                 DELETE FROM accounts
                 WHERE id=?;
                 """;
         try (Connection connection = ConnectionManager.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-            preparedStatement.setLong(1, account.getId());
+            preparedStatement.setLong(1, id);
             return !preparedStatement.execute();
         } catch (SQLException e) {
             throw new DatabaseException(e.getMessage());

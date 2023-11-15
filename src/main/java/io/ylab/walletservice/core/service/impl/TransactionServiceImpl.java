@@ -2,10 +2,15 @@ package io.ylab.walletservice.core.service.impl;
 
 import io.ylab.walletservice.core.domain.Currency;
 import io.ylab.walletservice.core.domain.Transaction;
+import io.ylab.walletservice.core.dto.account.AccountCreateDto;
+import io.ylab.walletservice.core.dto.account.AccountResponse;
+import io.ylab.walletservice.core.dto.account.AccountUpdateDto;
+import io.ylab.walletservice.core.dto.transaction.TransactionRequest;
+import io.ylab.walletservice.core.mapper.AccountMapper;
+import io.ylab.walletservice.core.mapper.TransactionMapper;
 import io.ylab.walletservice.exception.DatabaseException;
 import lombok.AllArgsConstructor;
 import io.ylab.walletservice.core.domain.Account;
-import io.ylab.walletservice.exception.TransactionException;
 import io.ylab.walletservice.core.repository.impl.TransactionRepositoryImpl;
 import io.ylab.walletservice.core.service.TransactionService;
 import io.ylab.walletservice.api.Validator;
@@ -107,14 +112,11 @@ public class TransactionServiceImpl implements TransactionService<Long> {
      * {@inheritDoc}
      */
     @Override
-    public void processTransactionAndUpdateAccount(Transaction transaction, Account account) throws DatabaseException {
+    public void processTransactionAndUpdateAccount(TransactionRequest transactionDto, AccountUpdateDto accountDto) throws DatabaseException {
+        Transaction transaction = TransactionMapper.INSTANCE.fromRequest(transactionDto);
+        Account account = AccountMapper.INSTANCE.fromUpdateDto(accountDto);
         transaction.setParticipantAccount(account);
         Validator.validateTransaction(transaction);
-        Optional<Transaction> maybeTransaction = findById(transaction.getId());
-
-        if (maybeTransaction.isPresent()) {
-            throw new TransactionException("Transaction id is not unique, please, provide another id");
-        }
 
         BigDecimal updatedBalance;
         switch (transaction.getType()) {
@@ -123,15 +125,15 @@ public class TransactionServiceImpl implements TransactionService<Long> {
             default -> updatedBalance = account.getCurrentBalance();
         }
         transactionRepository.save(transaction);
-        accountService.updateBalance(account, updatedBalance);
+        accountService.updateBalance(accountDto, updatedBalance);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public boolean delete(Transaction transaction) throws DatabaseException {
-        return transactionRepository.delete(transaction);
+    public boolean delete(Long id) throws DatabaseException {
+        return transactionRepository.delete(id);
     }
 
     private void setDependencies(Transaction transaction) throws DatabaseException {

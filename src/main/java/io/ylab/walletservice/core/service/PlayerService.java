@@ -2,6 +2,10 @@ package io.ylab.walletservice.core.service;
 
 import io.ylab.walletservice.core.domain.Player;
 import io.ylab.walletservice.core.domain.Transaction;
+import io.ylab.walletservice.core.dto.player.PlayerCreateDto;
+import io.ylab.walletservice.core.dto.player.PlayerUpdateDto;
+import io.ylab.walletservice.core.dto.player.PlayerResponse;
+import io.ylab.walletservice.core.dto.transaction.TransactionResponse;
 import io.ylab.walletservice.exception.DatabaseException;
 
 import java.util.List;
@@ -50,25 +54,27 @@ public interface PlayerService<K> {
     /**
      * Saves a new player entity if it does not exist, otherwise returns the existing one.
      *
-     * @param player The {@link Player} entity to save.
+     * @param playerDto The {@link Player} entity to save.
      * @return The saved or existing player entity.
      */
-    Player save(Player player) throws DatabaseException;
+    Player save(PlayerCreateDto playerDto) throws DatabaseException;
 
     /**
      * Updates an existing player entity. Note: In this context, updating means modifying the existing entity,
      * and this operation should be performed outside the scope of this method.
      *
-     * @param player The player entity to update.
+     * @param playerDto The player entity to update.
      */
-    void update(Player player) throws DatabaseException;
+    void update(PlayerUpdateDto playerDto) throws DatabaseException;
 
     /**
      * Deletes an existing player entity.
      *
-     * @param player The player entity to delete.
+     * @param id The player id to delete.
      * @return {@code true} if the deletion was successful, {@code false} otherwise.
      */
-    boolean delete(Player player) throws DatabaseException;
+    boolean delete(Long id) throws DatabaseException;
+    //TODO ADD DOC
+    boolean verifyPassword(String password, String username);
 }
 

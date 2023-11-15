@@ -1,6 +1,10 @@
 package io.ylab.walletservice.core.service.impl;
 
 import io.ylab.walletservice.core.domain.Transaction;
+import io.ylab.walletservice.core.dto.account.AccountCreateDto;
+import io.ylab.walletservice.core.dto.account.AccountResponse;
+import io.ylab.walletservice.core.dto.account.AccountUpdateDto;
+import io.ylab.walletservice.core.mapper.AccountMapper;
 import io.ylab.walletservice.core.service.AccountService;
 import io.ylab.walletservice.core.domain.Account;
 import io.ylab.walletservice.core.domain.Currency;
@@ -39,9 +43,7 @@ public class AccountServiceImpl implements AccountService<Long> {
     public Optional<Account> findById(Long id) throws DatabaseException {
         Validator.validateId(id);
         Optional<Account> account = accountRepository.findById(id);
-        if (account.isPresent()) {
-            setDependencies(account.get());
-        }
+        account.ifPresent(this::setDependencies);
         return account;
     }
 
@@ -56,9 +58,7 @@ public class AccountServiceImpl implements AccountService<Long> {
     public Optional<Account> findByPlayerId(Long playerId) throws DatabaseException {
         Validator.validateId(playerId);
         Optional<Account> account = accountRepository.findByPlayerId(playerId);
-        if (account.isPresent()) {
-            setDependencies(account.get());
-        }
+        account.ifPresent(this::setDependencies);
         return account;
     }
 
@@ -91,8 +91,8 @@ public class AccountServiceImpl implements AccountService<Long> {
      * {@inheritDoc}
      */
     @Override
-    public Account save(Account account) throws DatabaseException {
-        Account savedAccount = accountRepository.save(account);
+    public Account save(AccountCreateDto accountDto) throws DatabaseException {
+        Account savedAccount = accountRepository.save(AccountMapper.INSTANCE.fromRequest(accountDto));
         setDependencies(savedAccount);
         return savedAccount;
     }
@@ -101,7 +101,8 @@ public class AccountServiceImpl implements AccountService<Long> {
      * {@inheritDoc}
      */
     @Override
-    public void update(Account account) throws DatabaseException {
+    public void update(AccountUpdateDto dto) throws DatabaseException {
+        Account account = AccountMapper.INSTANCE.fromUpdateDto(dto);
         accountRepository.update(account);
         setDependencies(account);
     }
@@ -110,18 +111,20 @@ public class AccountServiceImpl implements AccountService<Long> {
      * {@inheritDoc}
      */
     @Override
-    public void updateBalance(Account account, BigDecimal updatedBalance) throws DatabaseException {
+    public void updateBalance(AccountUpdateDto dto, BigDecimal updatedBalance) throws DatabaseException {
         Validator.validateAmount(updatedBalance);
+        Account account = AccountMapper.INSTANCE.fromUpdateDto(dto);
         account.setCurrentBalance(updatedBalance);
-        update(account);
+        AccountMapper.INSTANCE.toUpdateDto(account);
+        update(dto);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public boolean delete(Account account) throws DatabaseException {
-        return accountRepository.delete(account);
+    public boolean delete(Long id) throws DatabaseException {
+        return accountRepository.delete(id);
     }
 
     private void setDependencies(Account account) throws DatabaseException {

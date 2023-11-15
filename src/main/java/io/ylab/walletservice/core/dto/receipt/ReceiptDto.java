@@ -1,4 +1,4 @@
-package io.ylab.walletservice.core.dto;
+package io.ylab.walletservice.core.dto.receipt;
 
 import io.ylab.walletservice.core.domain.Account;
 import io.ylab.walletservice.core.domain.Player;

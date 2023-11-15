@@ -164,14 +164,14 @@ public class TransactionRepositoryImpl implements TransactionRepository<Long> {
      * {@inheritDoc}
      */
     @Override
-    public boolean delete(Transaction transaction) throws DatabaseException {
+    public boolean delete(Long id) throws DatabaseException {
         String query = """
                 DELETE FROM transactions
                 WHERE id=?;
                 """;
         try (Connection connection = ConnectionManager.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-            preparedStatement.setLong(1, transaction.getId());
+            preparedStatement.setLong(1, id);
             return !preparedStatement.execute();
         } catch (SQLException e) {
             throw new DatabaseException(e.getMessage());
