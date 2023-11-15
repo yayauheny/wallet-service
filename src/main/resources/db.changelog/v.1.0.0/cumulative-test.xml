@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<databaseChangeLog
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+    <include file="000-create-schemas.xml" relativeToChangelogFile="true"/>
+    <include file="001-create-sequences.xml" relativeToChangelogFile="true"/>
+    <include file="002-create-currencies-table.xml" relativeToChangelogFile="true"/>
+    <include file="003-create-players-table.xml" relativeToChangelogFile="true"/>
+    <include file="004-create-accounts-table.xml" relativeToChangelogFile="true"/>
+    <include file="005-create-transactions-table.xml" relativeToChangelogFile="true"/>
+    <include file="006-set-relations.xml" relativeToChangelogFile="true"/>
+
+</databaseChangeLog>
